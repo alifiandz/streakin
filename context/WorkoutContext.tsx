@@ -176,10 +176,12 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Auto-rotating session calculation
   const getTodaySession = (): WorkoutSession => {
-    const userSessionIds =
+    const selectedIds =
       library?.sessionIds && library.sessionIds.length > 0
         ? library.sessionIds
         : ['s_lsit_1', 's1', 's_handstand_1', 's2'];
+    const userSessionIds = selectedIds.filter(id=>{const session=SEED_SESSIONS.find(s=>s.id===id);return session && (!session.skillId || !session.stageNumber || session.stageNumber <= getSkillProgress(session.skillId).currentStage)});
+    if(!userSessionIds.length)return SEED_SESSIONS.find(s=>s.id==='s1') || SEED_SESSIONS[0];
 
     if (logs.length === 0) {
       const first = SEED_SESSIONS.find((s) => s.id === userSessionIds[0]);
