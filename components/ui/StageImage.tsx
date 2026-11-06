@@ -14,6 +14,7 @@ interface StageImageProps {
   containerClassName?: string;
   aspectRatioClass?: string;
   sizes?: string;
+  reference?: {url:string;name:string};
 }
 
 const INTRINSIC_WIDTH = 1280;
@@ -32,6 +33,7 @@ export const StageImage: React.FC<StageImageProps> = ({
   containerClassName = '',
   aspectRatioClass = 'aspect-video',
   sizes = DEFAULT_SIZES,
+  reference,
 }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -67,6 +69,7 @@ export const StageImage: React.FC<StageImageProps> = ({
           <p className="text-sm font-bold text-[var(--text)] line-clamp-2 max-w-[90%]">
             {stageName}
           </p>
+          {reference && <a href={reference.url} target="_blank" rel="noreferrer" className="btn-brand px-4 py-2.5 min-h-[44px] text-xs mt-3">Lihat demonstrasi asli · {reference.name} ↗</a>}
           {typeof stageNumber === 'number' && (
             <p className="text-xs text-[var(--text-sub)] mt-0.5">Stage {stageNumber}</p>
           )}

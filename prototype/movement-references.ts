@@ -1,0 +1,1 @@
+export const movementReferences:Record<string,{url:string;name:string}>={'l-sit':{url:'https://gmb.io/l-sit/',name:'GMB Fitness'},'handstand':{url:'https://gmb.io/handstand/',name:'GMB Fitness'},'elbow-lever':{url:'https://www.hybridcalisthenics.com/elbowlevers',name:'Hybrid Calisthenics'}};

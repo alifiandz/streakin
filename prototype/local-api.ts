@@ -3,7 +3,19 @@ import { getLocalDateString } from '../src/utils/storage';
 const nativeFetch=window.fetch.bind(window);export const KEY='streakin_training_v2';
 type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[]};
 type DB={version:2;active:string|null;profiles:Profile[]};
-function read():DB{const raw=localStorage.getItem(KEY);if(!raw)return {version:2,active:null,profiles:[]};const d=JSON.parse(raw);if(d.version!==2||!Array.isArray(d.profiles))throw Error('Data lokal tidak valid. Pulihkan dari cadangan.');return d}
+function read():DB{
+ const raw=localStorage.getItem(KEY);if(!raw)return {version:2,active:null,profiles:[]};
+ const d=JSON.parse(raw);if(d.version!==2||!Array.isArray(d.profiles))throw Error('Data lokal tidak valid. Pulihkan dari cadangan.');
+ const profiles=d.profiles.filter((p:any)=>p&&typeof p.id==='string').map((p:any)=>{
+  const library=p.library&&typeof p.library==='object'?{...p.library,durasi:Array.isArray(p.library.durasi)?p.library.durasi.map(Number).filter(Number.isFinite):[],fokus:Array.isArray(p.library.fokus)?p.library.fokus.filter((x:any)=>typeof x==='string'):[],sessionIds:Array.isArray(p.library.sessionIds)?p.library.sessionIds.filter((id:any)=>typeof id==='string'&&SEED_SESSIONS.some(s=>s.id===id)):[]}:null;
+  const skills=(Array.isArray(p.skills)?p.skills:[]).filter((x:any)=>x&&typeof x.skillId==='string'&&SEED_SKILLS.some(s=>s.id===x.skillId)).map((x:any)=>({...x,currentStage:Math.max(1,Math.min(5,Math.floor(Number(x.currentStage)||1))),bestHoldSec:Math.max(0,Number(x.bestHoldSec)||0)}));
+  const logs=(Array.isArray(p.logs)?p.logs:[]).filter((x:any)=>x&&typeof x.id==='string').map((x:any)=>({...x,sets:(Array.isArray(x.sets)?x.sets:Array.isArray(x.setsCompleted)?x.setsCompleted:[]).filter((set:any)=>set&&typeof set.exerciseId==='string').map((set:any)=>({...set,valueLogged:Number(set.valueLogged??set.nilai)||0}))}));
+  return {...p,nama:typeof p.nama==='string'?p.nama:'Kawan',email:typeof p.email==='string'?p.email:'',library,skills,logs};
+ });
+ const cleaned={version:2 as const,active:typeof d.active==='string'?d.active:null,profiles};
+ if(JSON.stringify(cleaned)!==raw){try{if(!localStorage.getItem(KEY+'_recovery_snapshot'))localStorage.setItem(KEY+'_recovery_snapshot',raw)}catch{}}
+ return cleaned;
+}
 function save(d:DB){localStorage.setItem(KEY,JSON.stringify(d))}
 function reply(data:any,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}})}
 const pub=(p:Profile)=>({id:p.id,nama:p.nama,email:p.email});

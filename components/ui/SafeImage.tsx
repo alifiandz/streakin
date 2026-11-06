@@ -12,6 +12,7 @@ interface SafeImageProps {
   fallbackTitle?: string;
   fallbackSubtitle?: string;
   fallbackType?: 'exercise' | 'skill' | 'mascot';
+  reference?: {url:string;name:string};
 }
 
 export const SafeImage: React.FC<SafeImageProps> = ({
@@ -23,6 +24,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   fallbackTitle,
   fallbackSubtitle = 'Panduan visual latihan StreakIn',
   fallbackType = 'exercise',
+  reference,
 }) => {
   const [hasError, setHasError] = useState(false);
   useEffect(()=>setHasError(false),[src]);
@@ -58,6 +60,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
         <p className="text-xs text-[var(--text-sub)] mt-0.5">
           {fallbackSubtitle}
         </p>
+        {reference && <a href={reference.url} target="_blank" rel="noreferrer" className="btn-brand px-4 py-2.5 min-h-[44px] text-xs mt-3">Demonstrasi asli · {reference.name} ↗</a>}
       </div>
     );
   }

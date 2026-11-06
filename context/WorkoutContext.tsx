@@ -71,7 +71,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (skillRes.ok) {
         const skillData = await skillRes.json();
         if (skillData.success && Array.isArray(skillData.data) && skillData.data.length >= 0) {
-          setSkillProgressList(skillData.data);
+          setSkillProgressList(skillData.data.filter((p: any) => p && typeof p.skillId === 'string'));
         }
       }
 
@@ -157,7 +157,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const streak = calculateStreak(logs);
 
   const getSkillProgress = (skillId: string): UserSkillProgress => {
-    const found = skillProgressList.find((p) => p.skillId === skillId);
+    const found = skillProgressList.find((p) => p && p.skillId === skillId);
     if (found) return found;
     return {
       userId: currentUser?.id || '',

@@ -1,23 +1,23 @@
-# StreakIn training app — Sites edition
+# StreakIn — Vercel interface baseline
 
-Preserves the friend's current interface and original source reference in ORIGINAL_SOURCE.txt.
-
-Implemented training functions: device-local profiles with PBKDF2 password verifiers, persisted library, gated skill progression, actual reps/hold entry, validated complete sessions, timestamp-based timers, resumable set records, idempotent completion, local calendar-date streaks, separate rep totals, history, backup/restore, open-app reminders and calendar (.ics) export. Added a basic Legs template. Incorrect pose mappings have been removed or corrected; missing approved illustrations show neutral fallback labels.
+The friend's repository at the commit in ORIGINAL_SOURCE.txt is the visual baseline. Landing, dashboard, skill catalogue, header and global styles are copied exactly. Other changes are limited to runtime/data fixes and reference media links. No editorial redesign or generated pose atlas is used.
 
 ## Verification
-npm run build
-npx tsc --noEmit
-node tests/training.mjs
+- npm run build
+- npx tsc --noEmit
+- node tests/training.mjs
+- node tests/production-dom.mjs
+- node tests/production-dom.mjs corrupt blocked-scroll
+- node tests/ui.mjs navigation
+- node tests/vercel-baseline.mjs (requires the original checkout used during authoring)
 
-## Limits
-Data and profile login are device-local, not server authentication. Local profile isolation is an app convenience, not a security boundary against someone with device/browser access. No email recovery, automatic cloud sync, background push delivery, or deployed Jagoan backend. Browser preview QA is blocked by unavailable relay/desktop automation. Some movements still need approved illustrations. This release is not claimed to be flawless or production-complete.
+Production DOM tests run the actual compiled JavaScript with DOM navigation and click events, save a library, complete nine logged sets, check the completion screen and persisted history. Malformed saved progress and unavailable scroll APIs are regression cases. This is not a claim of completed live-browser visual testing.
 
-Production target: Jagoan Hosting + Webuzo, streakin.my.id. A real database/auth deployment and device browser verification remain required for production release.
+## Data and scope
+Profiles and training records are device-local. Password verifiers use PBKDF2; no email password recovery or cloud sync. Backup/restore and calendar export are available in reminder settings. Local profile separation is not a security boundary against someone with device access.
 
+## Movement media
+Only existing matching Orange Guy images are displayed. Unmatched stages link to actual demonstration references from GMB Fitness or Hybrid Calisthenics. They are labelled as references, not represented as exact custom stage artwork. Missing poses are not generated or substituted with unrelated movements.
 
-## Illustrated library revision
-Landing page now has an illustrated hero, skill exploration, technique narrative, interactive timer preview, smooth section navigation and final signup action. Library opens on skill posters; stage instructions appear only after opening a skill. Foundation programmes have their own detail pages. Library and roadmap browsing are public within the existing Sites access policy. Authenticated training state is unchanged.
-
-New route-tree tests exercise actual React links and buttons across the library, all skill roadmaps, foundation programmes, home, complete nine-set workout, summary, history, reminder settings and public signup journey. These are component interaction tests, not a claim of completed browser visual/device QA. Browser input remains unavailable in this environment.
-
-Art: original Orange Guy library plus a newly generated eight-pose atlas. Atlas support poses are mapped explicitly by skill and stage. Image failure state now resets when the source changes. Route-level errors retain navigation instead of trapping the entire app behind the root fallback.
+## Final hosting target
+Jagoan Hosting + Webuzo, streakin.my.id. No production hosting or DNS changes have been made.

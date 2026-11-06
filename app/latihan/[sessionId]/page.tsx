@@ -22,7 +22,7 @@ import { CompletedSet, ActiveWorkout } from '@/src/types';
 import { MobileContainer } from '@/components/layout/MobileContainer';
 import { SafeImage } from '@/components/ui/SafeImage';
 import { StageImage } from '@/components/ui/StageImage';
-import { SkillArt } from '@/prototype/SkillArt';
+import { movementReferences } from '@/prototype/movement-references';
 import { SEED_SKILLS } from '@/lib/seedData';
 import { safeLocalStorage, STORAGE_KEYS, getLocalDateString } from '@/src/utils/storage';
 
@@ -288,8 +288,6 @@ export default function WorkoutPlayerPage() {
   const matchedStageImage = SEED_SKILLS.flatMap((skill) =>
     skill.stages.map((stage) => ({ skill, stage }))
   ).find((item) => item.stage.imageUrl && item.stage.imageUrl === currentExerciseData.imageUrl);
-  const illustratedPoses:Record<string,{skill:string;stage:number}>={ex3:{skill:'handstand',stage:1},ex12:{skill:'l-sit',stage:4},ex15:{skill:'handstand',stage:4},ex17:{skill:'elbow-lever',stage:1},ex18:{skill:'elbow-lever',stage:2},ex19:{skill:'elbow-lever',stage:3},ex20:{skill:'elbow-lever',stage:4},ex21:{skill:'elbow-lever',stage:5}};
-  const illustratedPose=illustratedPoses[currentExerciseData.id];
   const isStageImage = Boolean(currentExerciseData.imageUrl?.startsWith('/images/skills/'));
 
   const totalExercises = session.exercises.length;
@@ -496,9 +494,10 @@ export default function WorkoutPlayerPage() {
       >
         {/* Media Container (16:9 Illustration / Image dengan Safe Fallback & Uncropped View) */}
         <div className="relative mb-3 sm:mb-4">
-          {illustratedPose ? (<div className="stage-art workout-pose-art"><SkillArt skill={illustratedPose.skill} stage={illustratedPose.stage}/></div>) : isStageImage ? (
+          {isStageImage ? (
             <StageImage
               src={currentExerciseData.imageUrl}
+              reference={session.skillId ? movementReferences[session.skillId] : undefined}
               stageName={matchedStageImage?.stage.nama || currentExerciseData.nama}
               skillName={matchedStageImage?.skill.nama}
               stageNumber={matchedStageImage?.stage.stageNumber}
@@ -510,6 +509,7 @@ export default function WorkoutPlayerPage() {
           ) : (
             <SafeImage
               src={currentExerciseData.imageUrl}
+              reference={session.skillId ? movementReferences[session.skillId] : undefined}
               alt={`Panduan gerakan ${currentExerciseData.nama} - Ramah kamar kos`}
               aspectRatioClass="aspect-video max-h-[200px] sm:max-h-[340px]"
               className="w-full h-full object-contain p-2 sm:p-4 filter drop-shadow-md"
