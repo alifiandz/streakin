@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Sparkles } from 'lucide-react';
 
 interface SafeImageProps {
@@ -25,6 +25,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   fallbackType = 'exercise',
 }) => {
   const [hasError, setHasError] = useState(false);
+  useEffect(()=>setHasError(false),[src]);
 
   if (!src || hasError) {
     if (fallbackType === 'mascot') {
