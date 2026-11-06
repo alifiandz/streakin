@@ -290,7 +290,6 @@ export default function SkillDetailPage() {
                 aspectRatioClass="aspect-video max-h-[220px] sm:max-h-[300px]"
                 className="w-full h-full object-contain p-2 sm:p-4 drop-shadow-md"
               />
-              {selectedStageData.imageUrl?.startsWith('https:')&&<a href={movementReferences['elbow-lever'].url} target="_blank" rel="noreferrer" className="block text-[10px] text-[#8A929C] mt-2">Foto demonstrasi pada parallettes: Hybrid Calisthenics ↗</a>}
             </div>
 
             <div className="lg:col-span-7 space-y-3">

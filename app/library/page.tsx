@@ -27,7 +27,6 @@ export default function LibraryPage(){
       const skill=SEED_SESSIONS.find(s=>s.skillId&&s.exercises[0]?.exerciseId===ex.id)?.skillId;
       return <article key={ex.id} className="card-surface p-3 border-[#2E3238]">
        <SafeImage src={ex.imageUrl} alt={ex.nama} fallbackTitle={ex.nama} fallbackSubtitle="Buka sumber demonstrasi untuk melihat gerakannya" reference={skill?movementReferences[skill]:undefined}/>
-       {ex.imageUrl?.startsWith('https:')&&<a href={movementReferences['elbow-lever'].url} target="_blank" rel="noreferrer" className="text-[10px] text-[#8A929C]">Foto: Hybrid Calisthenics ↗</a>}
        <h2 className="font-bold text-sm mt-3">{ex.nama}</h2><p className="text-xs text-[#8A929C] mt-1 mb-2">{ex.area} · {ex.targetDefault}</p>
        <details className="border-t border-[#2E3238] pt-2 text-xs"><summary className="min-h-[44px] cursor-pointer text-[#FF7A03] font-bold flex items-center">Lihat teknik & kesalahan umum</summary><ol className="list-decimal pl-5 space-y-2 text-[#EEF1F4] mb-3">{ex.langkah.map((step,i)=><li key={i}>{step}</li>)}</ol><p className="font-bold mb-1">Hindari:</p><ul className="list-disc pl-5 space-y-1 text-[#8A929C]">{ex.kesalahanUmum.map((step,i)=><li key={i}>{step}</li>)}</ul></details>
       </article>;

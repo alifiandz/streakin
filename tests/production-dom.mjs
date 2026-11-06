@@ -25,6 +25,7 @@ for(const skillId of ['l-sit','handstand','elbow-lever']) {
   assert.ok(stageButton,'Stage tab exists '+skillId+' '+stage);stageButton.click();await pause();
   assert.ok(w.document.body.textContent.includes('Stage '+stage+' dari 5'),'Selected stage changes');
   titles.add(w.document.querySelector('h3').textContent.trim());
+  assert.ok([...w.document.querySelectorAll('img')].every(img=>img.getAttribute('src')?.startsWith('/images/')),'Stage views only use Orange Guy library images');
  }
  assert.equal(titles.size,5,'Five distinct stage panels for '+skillId);
  const db=JSON.parse(w.localStorage.getItem('streakin_training_v2'));assert.ok(!db.profiles[0].skills.some(p=>p.currentStage>1),'Preview does not unlock stages');
@@ -36,6 +37,11 @@ assert.ok(w.document.body.textContent.includes('Latihan Selesai!'),'Summary rend
 // Public landing and its real navigation use the same compiled bundle.
 const savedDb=JSON.parse(w.localStorage.getItem('streakin_training_v2'));savedDb.active=null;w.localStorage.setItem('streakin_training_v2',JSON.stringify(savedDb));dom.window.close();
 const publicDom=new JSDOM(html,{url:'https://streakin.test/#/',runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});const pw=publicDom.window;pw.fetch=fetch;pw.Response=Response;pw.TextEncoder=TextEncoder;pw.TextDecoder=TextDecoder;pw.scrollTo=()=>{};pw.localStorage.setItem('streakin_training_v2',JSON.stringify(savedDb));Object.defineProperty(pw,'crypto',{value:webcrypto});pw.eval(fs.readFileSync('dist'+script,'utf8'));await pause();
-assert.ok(pw.document.querySelector('h1').textContent.includes('Skill pertamamu'),'Public landing hero');assert.equal(pw.document.querySelectorAll('#landing-skills article').length,3,'Landing skill previews');
+assert.ok(pw.document.querySelector('h1').textContent.includes('Latihan kalistenik,'),'Public landing hero');assert.equal(pw.document.querySelectorAll('#landing-skills article').length,3,'Landing skill previews');
+assert.equal(pw.document.querySelectorAll('#landing-hero img').length,0,'Original opening hero is text-only');
+assert.ok([...pw.document.querySelectorAll('img')].every(img=>img.getAttribute('src')?.startsWith('/images/')),'Only local Orange Guy artwork rendered');
+const durationButton=[...pw.document.querySelectorAll('button')].find(b=>b.textContent.trim()==='10 menit');durationButton.click();await pause();assert.ok(pw.document.body.textContent.includes('Quick Fit 10'),'Duration control changes the actual example session');
+[...pw.document.querySelectorAll('button')].find(b=>b.textContent.trim()==='20 menit').click();await pause();assert.ok(pw.document.body.textContent.includes('Upper Body Blast 20'),'20-minute example updates');
+assert.ok(pw.document.querySelectorAll('.landing-faq').length===4,'FAQ available');
 let scrolled=false;pw.document.getElementById('landing-skills').scrollIntoView=()=>{scrolled=true};[...pw.document.querySelectorAll('button')].find(b=>b.textContent.includes('Jelajahi Skill')).click();assert.ok(scrolled,'Hero browse action scrolls to skills');
 assert.equal(pw.document.querySelectorAll('a a').length,0,'No nested links');assert.equal(errors.length,0,'No production errors including public landing');publicDom.window.close();console.log('PASS public hero, scroll action, skill previews, valid links');

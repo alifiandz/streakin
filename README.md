@@ -17,7 +17,7 @@ Production DOM tests run the actual compiled JavaScript with DOM navigation and 
 Profiles and training records are device-local. Password verifiers use PBKDF2; no email password recovery or cloud sync. Backup/restore and calendar export are available in reminder settings. Local profile separation is not a security boundary against someone with device access.
 
 ## Movement media
-Matching Orange Guy images are displayed alongside real, source-linked Hybrid Calisthenics photos for straddle and full elbow lever. The external photos remain hosted by their source and may become unavailable. Stages without matching media link to actual demonstration references from GMB Fitness or Hybrid Calisthenics. They are labelled as references, not represented as exact custom stage artwork. Missing poses are not generated or substituted with unrelated movements.
+Only the user’s local Orange Guy artwork may be displayed. External photos have been removed from all routes. Elbow Lever uses the labelled presentation mascot as its cover; it is not passed off as an elbow lever pose. Stages without matching media link to actual demonstration references from GMB Fitness or Hybrid Calisthenics. They are labelled as references, not represented as exact custom stage artwork. Missing poses are not generated or substituted with unrelated movements.
 
 ## Final hosting target
 Jagoan Hosting + Webuzo, streakin.my.id. No production hosting or DNS changes have been made.
@@ -25,8 +25,13 @@ Jagoan Hosting + Webuzo, streakin.my.id. No production hosting or DNS changes ha
 Google sign-in preparation: [setup and acceptance checks](GOOGLE_SIGN_IN_SETUP.md). This is a final-hosting integration plan; Google login is not enabled in the device-local prototype.
 
 ## Refinement coverage
-- Landing: hero, browse-to-skill scroll, three skill previews, explanatory training flow, existing feature/session sections.
+- Landing: original centered text hero restored; lower sections use Orange Guy skill previews, a visual training path, a working 10/15/20-minute session preview, a clearly labelled sample activity tracker, FAQs, and final registration action.
 - Beranda: actual saved-session and completed-workout totals, current streak, last seven days, recent sessions, reminders, skill selection before setup and the existing daily training view afterward.
 - Library: skill boxes first; all five stages remain inside each skill. Searchable movement cards include technique details; supporting sessions retain duration/focus filtering and selection. Saving a skill adds only its active stage.
-- Media gaps still unresolved: L-Sit straddle; Handstand wall walk and kick-up; Elbow Lever stages 1–3. These show a demonstration source rather than a fabricated pose. Complete custom stage imagery is not claimed.
+- Media gaps still unresolved: L-Sit straddle; Handstand wall walk and kick-up; all Elbow Lever stages. These show a demonstration source rather than a fabricated pose. Complete custom stage imagery is not claimed.
 - Google: setup specification prepared, no OAuth client or working provider yet. Production data remains device-local until a backend is implemented.
+
+## Brand and imagery policy
+Use only the user's Orange Guy images for all app illustrations. Do not add photos, stock art, alternate characters or generated substitute poses. The uploaded StreakIn SI logo is the approved brand replacement; at this revision its image bytes have not reached the execution workspace, so the existing brand mark is retained pending the actual file. Do not trace or approximate it.
+
+Lower-section references: the user-supplied Claud composition (playful stickers and character-led sections), https://en.duolingo.com/ (mascot-led explanations), and https://www.headspace.com/app (clear product sections and focused actions). Reference graphics and claims are not reused.

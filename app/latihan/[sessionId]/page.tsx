@@ -519,7 +519,6 @@ export default function WorkoutPlayerPage() {
             />
           )}
 
-          {currentExerciseData.imageUrl?.startsWith('https:')&&<a href={movementReferences['elbow-lever'].url} target="_blank" rel="noreferrer" className="block text-[10px] text-[#8A929C] mt-2">Foto demonstrasi: Hybrid Calisthenics ↗</a>}
 
           {/* Badge Tempo / Mode */}
           <div className="absolute bottom-2.5 left-2.5 bg-[#15171A]/90 backdrop-blur px-2.5 py-1 rounded-lg border border-[#2E3238] text-[10px] sm:text-[11px] font-semibold text-[#FF7A03] shadow-md z-10">
