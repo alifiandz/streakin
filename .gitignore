@@ -6,3 +6,6 @@ dist/
 *.tsbuildinfo
 
 tests/.ui-bundle.mjs
+
+tests/.v3-*.mjs
+.v3-artifacts/

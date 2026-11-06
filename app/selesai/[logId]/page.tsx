@@ -106,7 +106,7 @@ export default function WorkoutDonePage() {
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-[#EEF1F4]">
-            Latihan Selesai! 🎉
+            Latihan Selesai!
           </h1>
           <p className="text-xs sm:text-sm text-[#8A929C] mt-1">
             Kerja bagus, {currentUser?.nama || 'Kawan'}! Satu sesi lebih dekat menuju postur kokoh & skill kalistenik impian.
@@ -167,7 +167,7 @@ export default function WorkoutDonePage() {
           <div className="card-surface p-3.5 sm:p-4 mb-3.5 border-[#FF7A03]/40 bg-gradient-to-r from-[#23272D] to-[#1E2227] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-[#FF7A03]/20 text-[#FF7A03] flex items-center justify-center font-bold">
-                🔥
+                <Flame className="w-4 h-4"/>
               </div>
               <div>
                 <span className="text-xs font-bold text-[#FF7A03] uppercase tracking-wider block">
@@ -194,7 +194,7 @@ export default function WorkoutDonePage() {
               </div>
               <div>
                 <h3 className="font-extrabold text-base sm:text-lg text-[#EEF1F4]">
-                  Streak {streak} Hari 🔥
+                  Streak {streak} Hari
                 </h3>
                 <p className="text-xs text-[#8A929C]">
                   Disiplin konsisten di sela tugas sekolah!

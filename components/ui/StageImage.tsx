@@ -64,11 +64,12 @@ export const StageImage: React.FC<StageImageProps> = ({
           aria-label={resolvedAlt}
         >
           <div className="w-14 h-14 rounded-2xl bg-[#15171A] border border-[var(--line)] flex items-center justify-center text-[#FF7A03] mb-2.5 shadow-md">
-            <PersonStanding className="w-7 h-7" aria-hidden="true" />
+            <img src="/images/mascot/ppt-explain.png" alt="Orange Dude mengenalkan panduan" className="w-14 h-14 object-contain"/>
           </div>
           <p className="text-sm font-bold text-[var(--text)] line-clamp-2 max-w-[90%]">
             {stageName}
           </p>
+          <p className="text-[10px] text-[var(--text-sub)] mt-2">Ilustrasi spesifik tahap belum tersedia.</p>
           {reference && <a href={reference.url} target="_blank" rel="noreferrer" className="btn-brand px-4 py-2.5 min-h-[44px] text-xs mt-3">Lihat demonstrasi asli · {reference.name} ↗</a>}
           {typeof stageNumber === 'number' && (
             <p className="text-xs text-[var(--text-sub)] mt-0.5">Stage {stageNumber}</p>

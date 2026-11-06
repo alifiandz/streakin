@@ -39,7 +39,9 @@
   },
   "include": [
     "prototype/**/*.ts",
-    "prototype/**/*.tsx"
+    "prototype/**/*.tsx",
+    "v3/**/*.ts",
+    "v3/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

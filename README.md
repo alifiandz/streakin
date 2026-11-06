@@ -1,46 +1,50 @@
-# StreakIn — Vercel interface baseline
+# Streakin V3
 
-The friend's repository at the commit in ORIGINAL_SOURCE.txt is the visual baseline. The original header, colors, typography, global styles and card classes are retained. Targeted refinements add a landing-page hero and skill previews, an always-visible dashboard overview, and a skill-first Library with movement search and supporting sessions. No generated pose atlas is used.
+A redesigned calisthenics prototype built on the existing React/Vite application. The active V3 branch is `streakin-v3`. The live V2 site has not been replaced; the user's brief requires confirming the publishing workflow first.
 
-## Verification
-- npm run build
-- npx tsc --noEmit
-- node tests/training.mjs
-- node tests/production-dom.mjs
-- node tests/production-dom.mjs corrupt blocked-scroll
-- node tests/ui.mjs navigation
-- node tests/vercel-baseline.mjs (requires the original checkout used during authoring)
+## Run and verify
 
-Production DOM tests run the actual compiled JavaScript with DOM navigation and click events, save a library, complete nine logged sets, check the completion screen and persisted history. Malformed saved progress and unavailable scroll APIs are regression cases. This is not a claim of completed live-browser visual testing.
+Use Node 24 (or Node 22.13+ for the independent SQLite tests):
 
-## Data and scope
-Profiles and training records are device-local. Password verifiers use PBKDF2; no email password recovery or cloud sync. Backup/restore and calendar export are available in reminder settings. Local profile separation is not a security boundary against someone with device access.
+```sh
+npm ci
+npm run dev
+npm run typecheck
+npm run build
+npm test
+```
 
-## Movement media
-Only the user’s local Orange Guy artwork may be displayed. External photos have been removed from all routes. Elbow Lever uses the labelled presentation mascot as its cover; it is not passed off as an elbow lever pose. Stages without matching media link to actual demonstration references from GMB Fitness or Hybrid Calisthenics. They are labelled as references, not represented as exact custom stage artwork. Missing poses are not generated or substituted with unrelated movements.
+`npm test` runs existing account/data regressions, V3 product API tests, real SQLite server-policy tests, and actual compiled-bundle DOM journeys. Legacy V2-only navigation/baseline scripts are historical and no longer define the V3 UI contract.
 
-## Final hosting target
-Jagoan Hosting + Webuzo, streakin.my.id. No production hosting or DNS changes have been made.
+## Active architecture
 
-Google sign-in preparation: [setup and acceptance checks](GOOGLE_SIGN_IN_SETUP.md). This is a final-hosting integration plan; Google login is not enabled in the device-local prototype.
+`prototype/main.tsx` boots the application, V3 catalogue and local API adapter. `v3/` contains the new screens, shared product state, centralized tier policy and UI system. `context/WorkoutContext.tsx` retains the existing completed-workout data flow. The original player is enhanced with preparation, admission checks, pause, timer/input checkpoints and recovery. Old duplicate `src/legacy_pages` and inactive Next API files are retained as source history, not used by the Vite runtime.
 
-## Refinement coverage
-- Landing: original centered text hero restored; lower sections use Orange Guy skill previews, a visual training path, a working 10/15/20-minute session preview, a clearly labelled sample activity tracker, FAQs, and final registration action.
-- Beranda: actual saved-session and completed-workout totals, current streak, last seven days, recent sessions, reminders, skill selection before setup and the existing daily training view afterward.
-- Library: skill boxes first; all five stages remain inside each skill. Searchable movement cards include technique details; supporting sessions retain duration/focus filtering and selection. Saving a skill adds only its active stage.
-- Media gaps still unresolved: L-Sit straddle; Handstand wall walk and kick-up; all Elbow Lever stages. These show a demonstration source rather than a fabricated pose. Complete custom stage imagery is not claimed.
-- Google: setup specification prepared, no OAuth client or working provider yet. Production data remains device-local until a backend is implemented.
+Five primary destinations: Home, Skills, Workouts, Progress and Profile. History logs, membership comparison, onboarding, reminders and Form Check are secondary destinations. Legacy `/library`, skill and workout links remain supported.
 
-## Brand and imagery policy
-Use only the user's Orange Guy images for all app illustrations. Do not add photos, stock art, alternate characters or generated substitute poses. The uploaded StreakIn SI logo is the approved brand replacement; at this revision its image bytes have not reached the execution workspace, so the existing brand mark is retained pending the actual file. Do not trace or approximate it.
+## Honest service boundaries
 
-Lower-section references: the user-supplied Claud composition (playful stickers and character-led sections), https://en.duolingo.com/ (mascot-led explanations), and https://www.headspace.com/app (clear product sections and focused actions). Reference graphics and claims are not reused.
+- The functioning review build uses browser-local profiles and records. Local plan switching is explicitly entitlement testing, not a paid subscription. Local storage is not a secure production billing boundary.
+- `v3/server/EntitlementStore.ts` is an independently tested server-side implementation for authoritative tiers, user ownership, atomic routine/quota limits and workout grants. It is not connected to the hosted frontend. See its README before production integration.
+- Billing/pricing, Google sign-in, cloud synchronization, private video uploads and a validated AI analysis service are not configured. No checkout success, AI score, technique feedback or commercial entitlement is fabricated.
+- AI preview validates supported video types and a maximum 30-second clip locally. Service admission remains disabled. Calendar-month quota design is 1 Free / 5 total Pro, Asia/Jakarta, with no rollover; server tests use transactional reservations.
 
-## Dashboard and history refinements
-The original landing badge is content-width and centered. Ambient shapes and Orange Guy presentation poses move gently; prefers-reduced-motion disables the animations.
+## Data preservation
 
-Beranda places the next session first, followed by four training metrics, a seven-day minutes chart, current skill stages, recent sessions and saved workouts. Riwayat adds a 28-day activity calendar, focus distribution, date-range and text filters, and native expandable per-set records.
+V2's `streakin_training_v2` store is preserved and extended additively with product state. No existing profiles/logs are deleted. Old seeded demo logs remain in backups but are excluded from actual-activity metrics. New V3 accounts, including the demo account, start without fabricated sessions.
 
-Only the explicit Rizky demo account (`usr_demo_1`) receives illustrative sample data: 12 sessions spanning 25 days, a populated Library and sample skill progress. A version marker prevents repeated seeding. Existing demo logs/library/progress are preserved when present; personal profiles never receive samples. Both screens label demo content clearly. These are device-local prototype records.
+New exports use `streakin-backup-v2` with routines/preferences/schedules. V1 backups still restore. Use V3 to restore V3 backups. Plans, usage counters and active grants are not imported from a backup. Free limits also apply to import, while already-owned grandfathered routines are preserved after downgrade.
 
-Verified through type checking, production build, account/API tests, route interaction tests and compiled-bundle DOM tests, including existing-empty-demo migration, no duplicate seeding, personal-account isolation, history filters and accordion closing. Live browser visual QA remains unavailable in this environment.
+## Imagery
+
+Only the user's Orange Dude assets are displayed. No new stock or real-person photos are included. Existing Front Lever images were compared with the user's corrected catalogue. Missing exact poses are explicitly labelled; the presentation mascot is never claimed to demonstrate a different exercise. The exact new SI logo file remains unavailable in the execution workspace, so it has not been approximated.
+
+## Delivery notes
+
+- `docs/V3_AUDIT.md`: baseline findings and what was retained.
+- `docs/V3_DESIGN.md`: design and UX changes.
+- `docs/V3_FEATURE_MATRIX.md`: complete Free/Pro matrix and integration dependencies.
+- `docs/V3_QA.md`: tested flows and verification limits.
+- `docs/V3_DEPLOYMENT.md`: confirmation required before replacing V2 or creating a separate private preview.
+
+Final hosting remains Jagoan Hosting/Webuzo at streakin.my.id. No DNS or production hosting changes have been made.

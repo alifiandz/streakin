@@ -1,0 +1,11 @@
+# V3 design and UX decisions
+
+- One primary question per destination: Home tells the next session; Skills tells the next progression; Workouts selects/reviews/builds a session; Progress explains actual completed activity; Profile owns preferences, schedule, backup and testing.
+- Original Orange Dude identity, orange accent and near-black surfaces remain. Thin rules, editorial sections, restrained imagery and clear type hierarchy replace repeated glowing dashboard boxes. Desktop navigation and five mobile destinations use the same architecture.
+- Foundation tracks have no Pro payment gates. Normal stage sequencing remains a training progression, with every stage available to inspect. Front Lever previews remain discoverable, with contextual membership explanation before starting a specialist session.
+- The existing validated set-logging/timer core is retained. Workout review separates preparation from training. New draft checkpoints retain typed values and timing; refresh resumes in a paused state. Hold results are not inferred from time spent away, and admitted workouts are not interrupted by a plan change.
+- Custom routines validate exercise identity, units, order, sets, target and rest. Free count limits also apply on backup import; a plan downgrade keeps existing routines rather than deleting user work.
+- No fabricated activity is added. Old generated demo records stay in raw backups but are excluded from activity metrics. Achievements, records and weekly reports use completed logs; reps and hold seconds are not combined into one performance score.
+- AI is a coming-soon workflow, not pretend coaching. The user can inspect a video locally, see requirements/allowance, and receive an explicit unavailable-service response. No video is uploaded, no quota is consumed, and no scores/feedback are fabricated.
+- Pro can be tested explicitly in Profile. It never appears as a purchased subscription. The comparison page does not invent a price or payment step.
+- Accessibility: native controls, labelled inputs, 44px minimum primary targets, semantic tables/details, modal keyboard focus handling and reduced-motion rules. Visual contrast and mobile overflow still require a real browser verification pass.

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Zap, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import {safeReturnTo} from '@/v3/navigation';
 import { MobileContainer } from '@/components/layout/MobileContainer';
 
 function AuthContent() {
@@ -30,9 +31,9 @@ function AuthContent() {
   // If already logged in, redirect to next or home
   useEffect(() => {
     if (currentUser) {
-      router.replace(nextParam ? decodeURIComponent(nextParam) : '/home');
+      router.replace(activeTab==='register'?'/onboarding?next='+encodeURIComponent(safeReturnTo(nextParam)):safeReturnTo(nextParam));
     }
-  }, [currentUser, router, nextParam]);
+  }, [currentUser, router, nextParam,activeTab]);
 
   // Register state
   const [regNama, setRegNama] = useState('');
@@ -56,7 +57,7 @@ function AuthContent() {
     const res = await register(regNama, regEmail, regPassword);
     setIsSubmitting(false);
     if (res.success) {
-      router.replace('/library');
+      router.replace('/onboarding?next='+encodeURIComponent(safeReturnTo(nextParam)));
     } else {
       setRegError(res.error || 'Gagal mendaftar');
     }
@@ -70,7 +71,7 @@ function AuthContent() {
     const res = await login(loginEmail, loginPassword);
     setIsSubmitting(false);
     if (res.success) {
-      const destination = nextParam ? decodeURIComponent(nextParam) : '/home';
+      const destination = safeReturnTo(nextParam);
       router.replace(destination);
     } else {
       setLoginError(res.error || 'Email atau kata sandi salah');

@@ -1,0 +1,2 @@
+export function safeReturnTo(value:string|null|undefined){if(!value||!/^\/(home|skills|workouts|latihan|builder|progress|profile|riwayat|form-check|notifikasi)(\/|\?|$)/.test(value)||value.includes('\\'))return '/home';return value;}
+export function navSection(path:string){if(path.startsWith('/skills'))return '/skills';if(/^\/(workouts|builder|library)/.test(path))return '/workouts';if(/^\/(progress|riwayat|selesai)/.test(path))return '/progress';if(/^\/(profile|notifikasi|membership|form-check|onboarding)/.test(path))return '/profile';return '/home';}

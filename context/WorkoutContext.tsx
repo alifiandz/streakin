@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback,useRef } from 'react';
 import {
   UserLibrary,
   WorkoutLog,
@@ -9,7 +9,9 @@ import {
   ReminderSetting,
   UserSkillProgress,
 } from '@/src/types';
-import { SEED_SESSIONS } from '@/lib/seedData';
+import { SEED_SESSIONS,sessionEquipment } from '@/v3/catalog';
+import { useProduct } from '@/v3/ProductContext';
+import {canTrain} from '@/v3/model';
 import { useAuth } from './AuthContext';
 import { safeLocalStorage, STORAGE_KEYS, calculateStreak, getLocalDateString } from '@/src/utils/storage';
 
@@ -23,7 +25,6 @@ interface WorkoutContextType {
   skillProgressList: UserSkillProgress[];
   getSkillProgress: (skillId: string) => UserSkillProgress;
   updateSkillStage: (skillId: string, stage: number) => Promise<void>;
-  updateBestHold: (skillId: string, holdSec: number) => Promise<void>;
   saveLibrary: (durasi: number[], fokus: string[], sessionIds: string[]) => Promise<void>;
   saveActiveWorkout: (active: ActiveWorkout | null) => void;
   clearActiveWorkout: () => void;
@@ -36,6 +37,9 @@ const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 
 export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser } = useAuth();
+  const actorRef=useRef(currentUser?.id);actorRef.current=currentUser?.id;
+  const {state:product}=useProduct();
+  const sessions=[...SEED_SESSIONS,...product.routines];
 
   const [library, setLibrary] = useState<UserLibrary | null>(null);
   const [logs, setLogs] = useState<WorkoutLog[]>([]);
@@ -53,7 +57,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // 1. Fetch Library
       const libRes = await fetch('/api/library');
       if (libRes.ok) {
-        const libData = await libRes.json();
+        const libData = await libRes.json();if(actorRef.current!==userId)return;
         if (libData.success && libData.data) {
           const l = libData.data;
           const parsedLib: UserLibrary = {
@@ -69,7 +73,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // 2. Fetch Skill Progress
       const skillRes = await fetch('/api/skills/progress');
       if (skillRes.ok) {
-        const skillData = await skillRes.json();
+        const skillData = await skillRes.json();if(actorRef.current!==userId)return;
         if (skillData.success && Array.isArray(skillData.data) && skillData.data.length >= 0) {
           setSkillProgressList(skillData.data.filter((p: any) => p && typeof p.skillId === 'string'));
         }
@@ -78,9 +82,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // 3. Fetch Workout Logs
       const logsRes = await fetch('/api/workout-logs');
       if (logsRes.ok) {
-        const logsData = await logsRes.json();
+        const logsData = await logsRes.json();if(actorRef.current!==userId)return;
         if (logsData.success && Array.isArray(logsData.data)) {
-          const mappedLogs: WorkoutLog[] = logsData.data.map((item: any) => ({
+          const mappedLogs: WorkoutLog[] = logsData.data.filter((item:any)=>!String(item.id).startsWith('demo-session-')).map((item: any) => ({
             id: item.id,
             userId: item.userId,
             sessionId: item.sessionId,
@@ -130,7 +134,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const active: ActiveWorkout = JSON.parse(rawActive);
         if (active.userId === currentUser.id) {
-          setActiveWorkout(active);
+          setActiveWorkout({...active,completedSets:Array.isArray(active.completedSets)?active.completedSets.filter(s=>s&&typeof s.exerciseId==='string'&&Number.isFinite(s.nilai)&&Number.isInteger(s.noSet)):[],exerciseIndex:Number.isInteger(active.exerciseIndex)?Math.max(0,active.exerciseIndex):0});
         } else {
           setActiveWorkout(null);
         }
@@ -172,20 +176,20 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const result=await res.json();if(!res.ok)throw new Error(result.error || 'Progres gagal disimpan');
     await loadUserData(currentUser!.id);
   };
-  const updateBestHold = async (_skillId: string, _holdSec: number) => {};
 
   // Auto-rotating session calculation
   const getTodaySession = (): WorkoutSession => {
     const selectedIds =
       library?.sessionIds && library.sessionIds.length > 0
         ? library.sessionIds
-        : ['s_lsit_1', 's1', 's_handstand_1', 's2'];
-    const userSessionIds = selectedIds.filter(id=>{const session=SEED_SESSIONS.find(s=>s.id===id);return session && (!session.skillId || !session.stageNumber || session.stageNumber <= getSkillProgress(session.skillId).currentStage)});
-    if(!userSessionIds.length)return SEED_SESSIONS.find(s=>s.id==='s1') || SEED_SESSIONS[0];
+        : (product.preferences.goal==='skills'?[...product.preferences.skills.filter(id=>product.preferences.experience!=='new'||id!=='front-lever').map(id=>sessions.find(s=>s.skillId===id&&s.stageNumber===getSkillProgress(id).currentStage)?.id).filter((id):id is string=>!!id),'s1','s2','s_legs_10']:product.preferences.goal==='strength'?['s1','s2','s_legs_10']:['s_legs_10','s2','s1']);
+    const compatible=selectedIds.filter(id=>library?.sessionIds?.length||sessionEquipment(id).every(e=>product.preferences.equipment.includes(e)));
+    const userSessionIds = (compatible.length?compatible:['s_legs_10']).filter(id=>{const session=sessions.find(s=>s.id===id);return session && canTrain(session,product.testTier) && (!session.skillId || !session.stageNumber || session.stageNumber <= getSkillProgress(session.skillId).currentStage)});
+    if(!userSessionIds.length)return sessions.find(s=>s.id==='s1') || sessions[0];
 
     if (logs.length === 0) {
-      const first = SEED_SESSIONS.find((s) => s.id === userSessionIds[0]);
-      return first || SEED_SESSIONS[0];
+      const first = sessions.find((s) => s.id === userSessionIds[0]);
+      return first || sessions[0];
     }
 
     const sortedLogs = [...logs].sort((a, b) => (b.tanggal > a.tanggal ? 1 : -1));
@@ -198,13 +202,13 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     const nextSessionId = userSessionIds[nextIndex];
-    return SEED_SESSIONS.find((s) => s.id === nextSessionId) || SEED_SESSIONS[0];
+    return sessions.find((s) => s.id === nextSessionId) || sessions[0];
   };
 
   const todaySession = getTodaySession();
 
   const getSessionById = (id: string): WorkoutSession | undefined => {
-    const session=SEED_SESSIONS.find((s) => s.id === id);
+    const session=sessions.find((s) => s.id === id);
     if(session?.skillId && session.stageNumber && session.stageNumber > getSkillProgress(session.skillId).currentStage) return undefined;
     return session;
   };
@@ -270,7 +274,6 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
         skillProgressList,
         getSkillProgress,
         updateSkillStage,
-        updateBestHold,
         saveLibrary,
         saveActiveWorkout,
         clearActiveWorkout,

@@ -43,18 +43,32 @@ export default function WorkoutPlayerPage() {
 
   // Session start time
   const [startTime, setStartTime] = useState<string>('');
+  const [sessionPaused,setSessionPaused]=useState(false);
+  const [elapsedActiveSec,setElapsedActiveSec]=useState(0);
+  const sessionTickRef=useRef(Date.now());
+  const checkpointReady=useRef(false);
+  const checkpointKey=`streakin_player_checkpoint_v3_${currentUser?.id}_${sessionId}`;
   const [actualValues,setActualValues]=useState<Record<string,number>>({});
   const lastFeedback=useRef<{value:number,time:number}|null>(null);
 
   useEffect(() => {
-    if (activeWorkout && activeWorkout.sessionId === sessionId) {
-      setExerciseIndex(activeWorkout.exerciseIndex || 0);
-      setCompletedSets(activeWorkout.completedSets || []);
-      setStartTime(activeWorkout.mulai);
-    } else {
-      setStartTime(new Date().toISOString());
+    let saved:any=null;
+    try{saved=JSON.parse(safeLocalStorage.getItem(checkpointKey)||'null');}catch{}
+    const matching=activeWorkout?.sessionId===sessionId?activeWorkout:null;
+    setExerciseIndex(Math.max(0,Math.min((session?.exercises.length||1)-1,matching?.exerciseIndex||saved?.exerciseIndex||0)));
+    const restoredSets=matching?.completedSets||saved?.completedSets;setCompletedSets(Array.isArray(restoredSets)?restoredSets.filter((set:any)=>set&&typeof set.exerciseId==='string'&&Number.isFinite(set.nilai)&&Number.isInteger(set.noSet)):[]);
+    setStartTime(matching?.mulai||saved?.startTime||new Date().toISOString());
+    if(saved){
+      const hold=Number.isFinite(saved.holdElapsed)?Math.max(0,Math.min(3600,saved.holdElapsed)):0;
+      setHoldTimerElapsed(hold);holdTimerBaseSecRef.current=hold;
+      setActualValues(saved.actualValues&&typeof saved.actualValues==='object'?saved.actualValues:{});
+      setElapsedActiveSec(Number.isFinite(saved.elapsedActiveSec)?Math.max(0,saved.elapsedActiveSec):0);
+      setSessionPaused(true);
+      const rest=saved.restEnd?Math.max(0,Math.ceil((saved.restEnd-Date.now())/1000)):saved.restSeconds;
+      setTimerSeconds(Number.isFinite(rest)?Math.max(0,Math.min(600,rest)):45);
     }
-  }, [activeWorkout, sessionId]);
+    checkpointReady.current=true;
+  }, [sessionId,currentUser?.id]);
 
   // Modal states
   const [showExitModal, setShowExitModal] = useState(false);
@@ -241,11 +255,34 @@ export default function WorkoutPlayerPage() {
       if (holdTimerStartMsRef.current) {
         const elapsedSinceResume = Math.floor((Date.now() - holdTimerStartMsRef.current) / 1000);
         holdTimerBaseSecRef.current += elapsedSinceResume;
+        setHoldTimerElapsed(holdTimerBaseSecRef.current);
         holdTimerStartMsRef.current = null;
       }
     }
     return () => clearInterval(interval);
   }, [holdTimerRunning, session, exerciseIndex, playCountdownFeedback]);
+
+  useEffect(()=>{
+    if(sessionPaused||isFinishing)return;
+    sessionTickRef.current=Date.now();
+    const interval=setInterval(()=>{const now=Date.now();const delta=Math.floor((now-sessionTickRef.current)/1000);if(delta>0){setElapsedActiveSec(old=>old+delta);sessionTickRef.current+=delta*1000;}},1000);
+    return()=>clearInterval(interval);
+  },[sessionPaused,isFinishing]);
+  useEffect(()=>{
+    if(!checkpointReady.current||!session||!currentUser||!startTime||isFinishing)return;
+    safeLocalStorage.setItem(checkpointKey,JSON.stringify({startTime,exerciseIndex,completedSets,actualValues,holdElapsed:holdTimerElapsed,restEnd:timerRunning?restTimerEndMsRef.current:null,restSeconds:timerSeconds,elapsedActiveSec}));
+    if(!activeWorkout||activeWorkout.sessionId!==session.id)saveActiveWorkout({userId:currentUser.id,sessionId:session.id,mulai:startTime,exerciseIndex,completedSets});
+  },[startTime,exerciseIndex,completedSets,actualValues,holdTimerElapsed,timerRunning,timerSeconds,elapsedActiveSec,isFinishing]);
+
+  useEffect(()=>{
+    if(!sessionPaused&&!showExitModal&&!tipModal)return;
+    const modal=document.querySelector?.('[role="dialog"]');if(!modal)return;
+    const previous=document.activeElement as HTMLElement|null;
+    const controls=()=>Array.from(modal.querySelectorAll<HTMLElement>('button,input,a[href]')).filter(el=>!(el as HTMLButtonElement).disabled);
+    controls()[0]?.focus();
+    function key(event:KeyboardEvent){if(event.key==='Escape'){setShowExitModal(false);setTipModal(null);setSessionPaused(false);}if(event.key==='Tab'){const all=controls();if(!all.length)return;const first=all[0],last=all[all.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}}
+    document.addEventListener('keydown',key);return()=>{document.removeEventListener('keydown',key);previous?.focus?.();};
+  },[sessionPaused,showExitModal,!!tipModal]);
 
   if (!session) {
     return (
@@ -300,8 +337,9 @@ export default function WorkoutPlayerPage() {
 
   // Handle set completion
   const handleCompleteSet = (setNumber: number, value: number) => {
-    const holdRecorded = isIsometricHold && holdTimerElapsed > 0 ? holdTimerElapsed : value;
-    if (!Number.isFinite(holdRecorded) || holdRecorded <= 0 || holdRecorded > 3600) { window.alert('Masukkan repetisi atau detik yang benar (1–3600).'); return; }
+    const entered=actualValues[currentExerciseData.id+':'+setNumber];
+    const holdRecorded=entered??(isIsometricHold&&holdTimerElapsed>0?holdTimerElapsed:value);
+    if (!Number.isFinite(holdRecorded) || holdRecorded <= 0 || holdRecorded > 3600 || (!isIsometricHold&&!Number.isInteger(holdRecorded))) { window.alert('Masukkan repetisi atau detik yang benar (1–3600).'); return; }
 
     const newCompleted: CompletedSet = {
       exerciseId: currentExerciseData.id,
@@ -340,15 +378,15 @@ export default function WorkoutPlayerPage() {
     }
 
     // Auto-start rest timer (45 seconds)
-    const restDuration = currentSessionExercise.istirahatDetik || 45;
+    const restDuration = currentSessionExercise.istirahatDetik ?? 45;
     setTimerSeconds(restDuration);
     restTimerEndMsRef.current = Date.now() + restDuration * 1000;
-    setTimerRunning(true);
+    setTimerRunning(restDuration>0);
   };
 
   const handleAdjustTimer = (delta: number) => {
     setTimerSeconds((prev) => {
-      const next = Math.min(300, Math.max(0, prev + delta));
+      const next = Math.min(600, Math.max(0, prev + delta));
       restTimerEndMsRef.current = Date.now() + next * 1000;
       return next;
     });
@@ -392,9 +430,7 @@ export default function WorkoutPlayerPage() {
       // Finish Workout!
       setIsFinishing(true);
       try {
-        const startMs = startTime ? new Date(startTime).getTime() : Date.now() - 60000;
-        const endMs = Date.now();
-        const durationSeconds = Math.max(60, Math.round((endMs - startMs) / 1000));
+        const durationSeconds = Math.max(1, elapsedActiveSec);
 
         const logId = await addWorkoutLog({
           sessionId: session.id,
@@ -405,6 +441,7 @@ export default function WorkoutPlayerPage() {
           setsCompleted: completedSets,
         });
 
+        safeLocalStorage.removeItem(checkpointKey);
         router.push(`/selesai/${logId}`);
       } catch (err) {
         console.error('Failed to save workout log', err);
@@ -415,6 +452,7 @@ export default function WorkoutPlayerPage() {
   };
 
   const handleExitWorkout = () => {
+    setSessionPaused(true);setHoldTimerRunning(false);setTimerRunning(false);
     setShowExitModal(false);
     router.push('/home');
   };
@@ -442,6 +480,7 @@ export default function WorkoutPlayerPage() {
 
           {/* Top Right Controls: Suara & Akhiri Latihan */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <button type="button" className="btn-outline min-h-[44px] px-3 text-xs" onClick={()=>{setSessionPaused(true);setHoldTimerRunning(false);setTimerRunning(false);}}>Jeda sesi</button>
             {/* Toggle Suara & Getaran - min 44x44px */}
             <button
               type="button"
@@ -478,10 +517,10 @@ export default function WorkoutPlayerPage() {
         </div>
 
         {/* Top Progress Bar */}
-        <div className="max-w-2xl mx-auto w-full bg-[#23272D] h-1.5 rounded-full mt-2 overflow-hidden">
+        <div role="progressbar" aria-label="Set selesai" aria-valuemin={0} aria-valuemax={session.exercises.reduce((n,e)=>n+e.sets,0)} aria-valuenow={completedSets.length} className="max-w-2xl mx-auto w-full bg-[#23272D] h-1.5 rounded-full mt-2 overflow-hidden">
           <div
             className="bg-[#FF7A03] h-full transition-all duration-300"
-            style={{ width: `${Math.max(5, ((exerciseIndex + 1) / totalExercises) * 100)}%` }}
+            style={{ width: `${(completedSets.length/session.exercises.reduce((n,e)=>n+e.sets,0))*100}%` }}
           />
         </div>
       </div>
@@ -514,7 +553,7 @@ export default function WorkoutPlayerPage() {
               aspectRatioClass="aspect-video max-h-[200px] sm:max-h-[340px]"
               className="w-full h-full object-contain p-2 sm:p-4 filter drop-shadow-md"
               fallbackTitle={currentExerciseData.nama}
-              fallbackSubtitle="Panduan Form Ideal • Ramah Kamar Kos"
+              fallbackSubtitle="Ilustrasi spesifik belum tersedia. Baca teknik gerakan."
               fallbackType="exercise"
             />
           )}
@@ -580,6 +619,7 @@ export default function WorkoutPlayerPage() {
                   type="button"
                   onClick={() => {
                     initOrResumeAudio();
+                    setTimerRunning(false);restTimerEndMsRef.current=null;
                     setHoldTimerRunning(true);
                   }}
                   className="min-h-[48px] py-3 px-4 rounded-xl bg-[#FF7A03] hover:bg-[#E66E00] text-[#15171A] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all select-none"
@@ -651,7 +691,7 @@ export default function WorkoutPlayerPage() {
                       </span>
                       <label className="text-[10px] text-[#8A929C] block mt-1">
                         Hasil aktual ({currentSessionExercise.unit})
-                        <input aria-label={`Hasil set ${setNo}`} type="number" min="1" max="3600" step="1" value={actualValues[currentExerciseData.id+':'+setNo] ?? completedItem?.nilai ?? currentSessionExercise.target} onChange={e=>setActualValues(prev=>({...prev,[currentExerciseData.id+':'+setNo]:Number(e.target.value)}))} className="block w-20 bg-[#23272D] border border-[#2E3238] rounded px-2 py-2 text-xs text-[#EEF1F4] mt-1" />
+                        <input aria-label={`Hasil set ${setNo}`} disabled={isSetDone} type="number" min="1" max="3600" step="1" value={actualValues[currentExerciseData.id+':'+setNo] ?? completedItem?.nilai ?? currentSessionExercise.target} onChange={e=>setActualValues(prev=>({...prev,[currentExerciseData.id+':'+setNo]:Number(e.target.value)}))} className="block w-20 bg-[#23272D] border border-[#2E3238] rounded px-2 py-2 text-xs text-[#EEF1F4] mt-1" />
                       </label>
                       {completedItem && (
                         <p className="text-[11px] text-[#FF7A03]">
@@ -827,7 +867,7 @@ export default function WorkoutPlayerPage() {
               </>
             ) : (
               <>
-                <span>Selesai Latihan & Simpan Progres 🎉</span>
+                <span>Selesai Latihan & Simpan Progres</span>
                 <CheckCircle2 className="w-4 h-4" />
               </>
             )}
@@ -835,9 +875,10 @@ export default function WorkoutPlayerPage() {
         </div>
       </div>
 
+      {sessionPaused&&<div role="dialog" aria-modal="true" aria-labelledby="session-pause-title" className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"><div className="v3-panel max-w-sm w-full"><h2 id="session-pause-title" className="text-xl font-bold mb-3">Sesi dijeda</h2><p className="text-sm text-[#8A929C] mb-5">Set, isian hasil, dan waktu latihanmu tersimpan. Timer tahanan dipulihkan dalam keadaan jeda agar kamu bisa memeriksa hasil aktual.</p><button className="v3-button w-full" onClick={()=>setSessionPaused(false)}>Lanjutkan sesi</button><button className="v3-button secondary w-full mt-3" onClick={()=>router.push('/home')}>Simpan draft & keluar</button></div></div>}
       {/* Exit Confirmation Modal */}
       {showExitModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Konfirmasi latihan" className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="card-surface p-5 sm:p-6 max-w-sm w-full border-[#2E3238] shadow-2xl">
             <h3 className="text-base sm:text-lg font-bold text-[#EEF1F4] mb-1.5">Akhiri Latihan?</h3>
             <p className="text-xs text-[#8A929C] mb-4 leading-relaxed">
@@ -865,7 +906,7 @@ export default function WorkoutPlayerPage() {
 
       {/* Tip Explanatory Modal */}
       {tipModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Konfirmasi latihan" className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="card-surface p-5 sm:p-6 max-w-sm w-full border-[#2E3238] shadow-2xl">
             <div className="flex items-center gap-2 text-[#FF7A03] mb-2 font-bold text-sm">
               <Info className="w-4 h-4" />

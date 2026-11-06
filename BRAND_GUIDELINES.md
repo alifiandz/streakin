@@ -1,3 +1,9 @@
+# Active V3 direction
+
+The user’s V3 brief in docs/V3_BRIEF.md supersedes prior layout restrictions: a full design and navigation overhaul is authorized. Keep the Orange Dude identity and orange/near-black visual palette, use only the supplied mascot library, and never fabricate payments, AI feedback, or activity statistics. The prior SI logo still requires the exact source file; do not approximate it. The live V2 must not be overwritten without confirming the deployment workflow.
+
+The earlier V2-specific rules below remain historical context, not a restriction against the explicitly requested V3 redesign.
+
 # StreakIn brand requirements
 
 - The opening public landing hero follows the user's original centered dark/orange screenshot: the same heading, supporting copy, main registration CTA and login line. Keep the top hero text-only.

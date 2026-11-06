@@ -48,11 +48,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
         aria-label={alt}
       >
         <div className="w-14 h-14 rounded-2xl bg-[#15171A] border border-[var(--line)] flex items-center justify-center text-[#FF7A03] mb-2.5 shadow-md">
-          {fallbackType === 'skill' ? (
-            <Sparkles className="w-7 h-7" />
-          ) : (
-            <Play className="w-7 h-7 fill-current ml-0.5" />
-          )}
+          <img src="/images/mascot/ppt-explain.png" alt="Orange Dude mengenalkan panduan" className="w-14 h-14 object-contain"/>
         </div>
         <p className="text-sm font-bold text-[var(--text)] line-clamp-1 max-w-[90%]">
           {fallbackTitle || alt}
