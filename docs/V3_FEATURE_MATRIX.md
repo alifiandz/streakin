@@ -6,11 +6,11 @@
 |---|---|---|---|
 | L-Sit foundation | All 5 stages | Same | Implemented; previews, manual advancement and evidence-backed final self-confirmation |
 | Handstand Foundations | All 5 stages | Same | Implemented; no paid stage gates |
-| Elbow Lever | All 5 stages retained | Same | Existing track retained; exact Orange Dude pose images missing |
+| Elbow Lever | All 5 stages retained | Same | Track retained; generated full-pose image added, earlier-stage exact art still missing |
 | Front Lever specialization | Discoverable stage preview | Instructions, sessions and progression | Implemented, gated in routes and local API; server grant policy tested |
 | Planche, Muscle-Up, Advanced Handstand | Future discovery labels | Future tracks | Not yet available; explicitly labelled |
 | Essential tutorials | Included | Included | Technique details, requirements, easier/harder variations |
-| Preset workouts | 3 | Same | Push 15, Core & Stabilizer 10, Legs Foundations 10 |
+| Preset workouts | 9 | Same | Nine goal-specific programs, all with review, player and completion |
 | Workout sessions / hold & rest timers | Unlimited | Unlimited | Existing wall-clock timers retained; review/start, pause, checkpoints, typed results and acknowledged completion |
 | Saved custom routines | 1 | No routine-count limit | Builder, order, sets, reps/seconds, rest, edit, delete and completion implemented; practical per-routine validation bounds apply |
 | Existing routines after downgrade | Kept and editable | — | No destructive deletion; new Free routine creation blocked at limit |

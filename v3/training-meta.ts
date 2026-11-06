@@ -11,6 +11,11 @@ export function workoutEquipment(session:WorkoutSession){return [...new Set(sess
 export function missingEquipment(session:WorkoutSession,available:string[]){return workoutEquipment(session).filter(id=>!available.includes(id));}
 const presets:Record<string,{goal:string;category:string;difficulty:string;short:string}>={
  s_quick_core_5:{goal:'Aktivasi inti tubuh dalam sesi singkat',category:'core',difficulty:'Pemula',short:'Inti tubuh'},
+ s4:{goal:'Dorong dan stabilkan tubuh',category:'full',difficulty:'Dasar',short:'Seluruh tubuh'},
+ s5:{goal:'Kekuatan tubuh bagian atas',category:'push',difficulty:'Menengah',short:'Dorong'},
+ s_core_15:{goal:'Kontrol perut dan pinggul',category:'core',difficulty:'Dasar',short:'Inti tubuh'},
+ s_legs_20:{goal:'Kekuatan kaki dan inti',category:'legs',difficulty:'Menengah',short:'Kaki'},
+ s_mobility_10:{goal:'Gerak bahu dan pergelangan',category:'mobility',difficulty:'Pemula',short:'Mobilitas'},
  s1:{goal:'Kekuatan dada, bahu, dan trisep',category:'push',difficulty:'Dasar',short:'Dorong'},
  s2:{goal:'Kontrol inti tubuh dan tumpuan bahu',category:'core',difficulty:'Dasar',short:'Inti tubuh'},
  s_legs_10:{goal:'Fondasi kaki dan kestabilan tubuh',category:'legs',difficulty:'Pemula',short:'Kaki'},

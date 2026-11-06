@@ -19,7 +19,7 @@ export default function Skills(){
    const progress=getSkillProgress(skill.id);const stage=skill.stages[progress.currentStage-1];const premium=isProSkill(skill.id);const locked=premium&&state.testTier!=='pro';
    const currentSession=SEED_SESSIONS.find(s=>s.skillId===skill.id&&s.stageNumber===progress.currentStage);
    const attempts=logs.filter(log=>log.sessionId===currentSession?.id||guidedInfo(log.sessionId)?.skillId===skill.id&&guidedInfo(log.sessionId)?.stage===progress.currentStage).length;
-   const illustration=skill.id==='elbow-lever'?undefined:skill.stages[4].imageUrl;
+   const illustration=skill.stages[4].imageUrl;
    return <article className={`skill-journey ${locked?'is-premium':''}`} key={skill.id}>
     <div className="skill-journey-header"><div><div className="flex items-center gap-2 mb-2"><span className={`v3-pill ${premium?'pro':''}`}>{premium?'PRO':'FREE'}</span><span className="text-[10px] text-[#8A929C]">{skillThemes[skill.id].focus}</span></div><Link href={`/skills/${skill.id}`}><h2>{skill.nama}</h2></Link><p>{skillThemes[skill.id].hook}</p></div>{illustration?<Link href={`/skills/${skill.id}`} className="skill-goal-art"><img src={illustration} alt={`Tujuan akhir ${skill.nama}, bukan ilustrasi tahap aktif`} loading="lazy"/><span>Posisi tujuan</span></Link>:<div className="skill-art-note"><Flag className="w-5 h-5 text-[#FF7A03]"/><span>Ilustrasi Elbow Lever<br/>belum tersedia</span></div>}</div>
     <SkillMilestones skillId={skill.id} current={progress.currentStage} completed={!!progress.completedAt} locked={locked}/>

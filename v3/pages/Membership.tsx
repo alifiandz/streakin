@@ -1,24 +1,13 @@
-import React from 'react';
+import React,{useState} from 'react';
 import Link from 'next/link';
+import {Check,Minus,ArrowRight,Zap,Layers,TrendingUp,Flag} from 'lucide-react';
 import {useProduct} from '../ProductContext';
 import {Page,Message} from '../components/UI';
-const rows=[
- ['Jalur fondasi L-Sit & Handstand','Semua tahap','Semua tahap'],
- ['Tutorial dasar, sesi, timer & log','Tanpa batas','Tanpa batas'],
- ['Program latihan dasar','3 program','3 program + personalisasi'],
- ['Rutinitas kustom tersimpan','1','Tanpa batas jumlah'],
- ['Streak, pencapaian & progres manual','Termasuk','Termasuk'],
- ['Jadwal latihan','Manual','Manual + saran personal'],
- ['Front Lever','Pratinjau','Jalur progresi + sesi spesialis'],
- ['Analitik, tren & laporan mingguan','Ringkasan dasar','Rincian lanjutan'],
- ['AI Form Check · belum operasional','1 / bulan saat aktif','5 total / bulan saat aktif'],
- ['Sinkronisasi antarperangkat','Belum terhubung','Belum terhubung'],
- ['Planche, Muscle-Up, Advanced Handstand','Belum tersedia','Rencana masa depan, belum tersedia'],
- ['Tantangan lanjutan','Tidak termasuk','Belum tersedia'],
-];
-export default function Membership(){const {state}=useProduct();return <Page title="Fondasi gratis. Spesialisasi saat siap." eyebrow="Free & Pro" description="Latihan dasar tetap lengkap. Pro ditujukan untuk spesialisasi dan pemahaman progres yang lebih dalam.">
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-7"><section className="v3-panel"><p className="v3-eyebrow">Streakin Free</p><h2 className="text-2xl font-bold mb-3">Belajar, latihan,<br/>jaga konsistensi.</h2><p className="text-xs text-[#8A929C]">Semua tahap fondasi, tiga program dasar, satu rutinitas kustom, dan sesi tanpa batas.</p><Link href="/workouts" className="v3-text-link mt-3">Lanjutkan latihan gratis →</Link></section><section className="v3-panel !border-[#FF7A03]/40"><p className="v3-eyebrow">Streakin Pro</p><h2 className="text-2xl font-bold mb-3">Kuasai skill lanjutan.<br/>Latih lebih terarah.</h2><p className="text-xs text-[#8A929C]">Front Lever, rutinitas lebih banyak, saran latihan berbasis preferensi, dan analitik lanjutan.</p><p className="text-xs text-[#FF7A03] font-bold mt-5"><span className="pro-price">Rp49.000</span><span className="pro-price-note">Harga Pro · pembayaran belum tersedia</span></p></section></div>
- <div className="overflow-x-auto"><table className="v3-feature-table"><caption className="sr-only">Perbandingan fitur Free dan Pro termasuk status integrasi</caption><thead><tr><th>Fitur</th><th>Free</th><th>Pro</th></tr></thead><tbody>{rows.map(([feature,free,pro])=><tr key={feature}><td>{feature}</td><td>{free}</td><td>{pro}</td></tr>)}</tbody></table></div>
- <Message>Ini adalah prototipe lokal. Paket uji saat ini: {state.testTier==='pro'?'Pro':'Free'}. Tidak ada langganan aktif, pembayaran, atau tagihan yang dibuat. Batas lokal dapat diubah melalui perangkat; penegakan produksi memerlukan backend terautentikasi.</Message><Link href="/profile" className="v3-text-link">Pengujian akses paket ada di Profil →</Link>
- <p className="text-xs text-[#8A929C] mt-4">Kuota AI tidak bergulir ke bulan berikutnya. Pro mendapat 5 total analisis, bukan tambahan 5. Video maksimal 30 detik; layanan analisis belum terhubung.</p>
- </Page>;}
+const rows=[['Fondasi L-Sit, Handstand, Elbow Lever','Semua tahap','Semua tahap'],['Program latihan Free','9 program','9 program'],['Sesi, timer & riwayat','Tanpa batas','Tanpa batas'],['Rutinitas tersimpan','1','Tanpa batas'],['Front Lever','Pratinjau','Semua tahap'],['Rencana personal','—','Termasuk'],['Analitik & tren','Ringkasan','Lanjutan'],['AI Form Check · segera hadir','1/bulan saat aktif','5/bulan saat aktif']];
+export default function Membership(){const {state}=useProduct();const [purchase,setPurchase]=useState(false);return <div className="visual-membership"><Page title="Pilih teman perjalananmu." eyebrow="Streakin Free & Pro" description="Mulai gratis. Tambah spesialisasi saat siap.">
+ <div className="pricing-plans"><section className="pricing-plan"><span className="v3-pill">FREE</span><h2>Bangun fondasimu.</h2><strong className="pricing-amount">Rp0</strong><p>Latihan dasar, selamanya gratis.</p><ul>{['9 program latihan','Semua tahap fondasi','1 rutinitas kustom','Timer & riwayat tanpa batas'].map(t=><li key={t}><Check/>{t}</li>)}</ul><Link href="/workouts" className="v3-button secondary w-full">Mulai gratis <ArrowRight/></Link></section>
+ <section className="pricing-plan featured"><span className="v3-pill pro">STREAKIN PRO</span><h2>Melangkah lebih jauh.</h2><strong className="pricing-amount">Rp49.000</strong><p>Spesialisasi dan latihan lebih terarah.</p><ul>{['Semua fitur Free','Jalur Front Lever','Rutinitas tanpa batas','Rencana personal & analitik'].map(t=><li key={t}><Check/>{t}</li>)}</ul><button className="v3-button w-full" onClick={()=>setPurchase(true)}>Beli sekarang <ArrowRight/></button><p className="pricing-availability">Pratinjau · checkout belum tersedia</p>{purchase&&<div className="purchase-notice" role="status"><h3>Checkout segera hadir.</h3><p>Belum ada pembayaran atau langganan yang dibuat.</p><button className="v3-text-link" onClick={()=>setPurchase(false)}>Tutup</button></div>}</section></div>
+ <div className="pro-benefit-strip">{[[Flag,'Skill spesialis'],[Layers,'Rutinitas tanpa batas'],[TrendingUp,'Analitik lanjutan'],[Zap,'Rencana personal']].map(([Icon,title]:any)=><div key={title}><Icon/><span>{title}</span></div>)}</div>
+ <h2 className="comparison-title">Yang kamu dapatkan</h2><div className="comparison-wrap"><table className="plan-comparison"><caption className="sr-only">Perbandingan Free dan Pro</caption><thead><tr><th>Fitur</th><th>Free</th><th>Pro</th></tr></thead><tbody>{rows.map(([feature,free,pro])=><tr key={feature}><th scope="row">{feature}</th><td>{free==='—'?<Minus aria-label="Tidak termasuk"/>:free}</td><td><span>{pro}</span></td></tr>)}</tbody></table></div>
+ <details className="membership-status"><summary>Status fitur & layanan</summary><p>AI Form Check, sinkronisasi cloud, Planche, Muscle-Up, Handstand lanjutan, dan tantangan lanjutan belum tersedia. Kuota AI tidak bergulir; Pro mendapat 5 total/bulan, video maksimal 30 detik.</p><Message>Paket uji: {state.testTier==='pro'?'Pro':'Free'}. Pembayaran belum tersedia. Tidak ada langganan aktif atau tagihan yang dibuat.</Message><Link href="/profile" className="v3-text-link">Pengujian paket di Profil →</Link></details>
+ </Page></div>;}

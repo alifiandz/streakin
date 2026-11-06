@@ -33,3 +33,15 @@ if(!SEED_SESSIONS.some(s=>s.id==='s_quick_core_5'))SEED_SESSIONS.push({id:'s_qui
 // Deterministic, stage-bound guided variants; no custom-routine slot is consumed.
 import {createGuidedSessions} from './guided-training';
 SEED_SESSIONS.push(...createGuidedSessions(SEED_SESSIONS).filter(s=>!SEED_SESSIONS.some(old=>old.id===s.id)));
+
+// User-requested Full Elbow Lever asset; never reuse it for earlier progressions.
+const elbow=SEED_SKILLS.find(s=>s.id==='elbow-lever');if(elbow)elbow.stages[4].imageUrl='/images/skills/elbow-lever-full-generated.png';
+const elbowEx=SEED_EXERCISES.find(e=>e.id==='ex21');if(elbowEx)elbowEx.imageUrl='/images/skills/elbow-lever-full-generated.png';
+const addedPrograms=[
+ {id:'s_core_15',nama:'Core Control 15',durasiMenit:15,fokus:'Pull dan core' as const,exercises:[{exerciseId:'ex9',sets:3,target:10,unit:'reps' as const,istirahatDetik:45},{exerciseId:'ex23',sets:3,target:20,unit:'detik' as const,istirahatDetik:60,isIsometric:true},{exerciseId:'ex10',sets:3,target:25,unit:'detik' as const,istirahatDetik:45,isIsometric:true}]},
+ {id:'s_legs_20',nama:'Legs & Core 20',durasiMenit:20,fokus:'Legs' as const,exercises:[{exerciseId:'ex26',sets:4,target:12,unit:'reps' as const,istirahatDetik:60},{exerciseId:'ex9',sets:3,target:10,unit:'reps' as const,istirahatDetik:45},{exerciseId:'ex10',sets:3,target:30,unit:'detik' as const,istirahatDetik:60,isIsometric:true}]},
+ {id:'s_mobility_10',nama:'Bahu & Mobilitas 10',durasiMenit:10,fokus:'Full body' as const,exercises:[{exerciseId:'ex22',sets:2,target:30,unit:'detik' as const,istirahatDetik:20,isIsometric:true},{exerciseId:'ex24',sets:3,target:8,unit:'reps' as const,istirahatDetik:45},{exerciseId:'ex25',sets:2,target:25,unit:'detik' as const,istirahatDetik:30,isIsometric:true}]},
+];
+for(const program of addedPrograms)if(!SEED_SESSIONS.some(s=>s.id===program.id))SEED_SESSIONS.push(program);
+
+const deadBug=SEED_EXERCISES.find(e=>e.id==='ex9');if(deadBug){deadBug.imageUrl='/images/exercises/dead-bug-extension-generated.png';deadBug.langkah=['Telentang. Angkat tangan; tekuk pinggul dan lutut 90°.','Jaga punggung bawah stabil. Luruskan satu lengan dan kaki yang berlawanan.','Kembali perlahan, lalu ganti sisi. Satu sisi = satu repetisi.','Buang napas saat meluruskan. Pendekkan jangkauan bila punggung melengkung.'];deadBug.kesalahanUmum=['Mengangkat kepala atau melakukan sit-up.','Meluruskan lengan dan kaki pada sisi yang sama.','Memaksakan jangkauan hingga punggung bawah melengkung.'];deadBug.lebihMudah='Gerakkan satu kaki; tangan tetap di atas dada';deadBug.lebihSulit='Perlambat gerakan tanpa mengubah posisi punggung';}
