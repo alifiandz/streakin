@@ -9,9 +9,9 @@ import {
   ReminderSetting,
   UserSkillProgress,
 } from '@/src/types';
-import { SEED_SESSIONS,sessionEquipment } from '@/v3/catalog';
+import { SEED_SESSIONS } from '@/v3/catalog';
 import { useProduct } from '@/v3/ProductContext';
-import {canTrain} from '@/v3/model';
+import {recommendWorkouts} from '@/v3/recommendations';
 import { useAuth } from './AuthContext';
 import { safeLocalStorage, STORAGE_KEYS, calculateStreak, getLocalDateString } from '@/src/utils/storage';
 
@@ -22,8 +22,10 @@ interface WorkoutContextType {
   streak: number;
   reminder: ReminderSetting;
   todaySession: WorkoutSession;
+  recommendation: ReturnType<typeof recommendWorkouts>[number] | null;
   skillProgressList: UserSkillProgress[];
   getSkillProgress: (skillId: string) => UserSkillProgress;
+  completeSkill: (skillId:string,reopen?:boolean) => Promise<void>;
   updateSkillStage: (skillId: string, stage: number) => Promise<void>;
   saveLibrary: (durasi: number[], fokus: string[], sessionIds: string[]) => Promise<void>;
   saveActiveWorkout: (active: ActiveWorkout | null) => void;
@@ -171,41 +173,21 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   };
 
+  const completeSkill = async (skillId:string,reopen=false) => {
+    const actor=currentUser?.id;if(!actor)throw Error('Masuk terlebih dahulu.');
+    const res=await fetch('/api/skills/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({skillId,action:reopen?'reopen':'complete',confirmed:!reopen})});
+    const result=await res.json();if(!res.ok)throw Error(result.error||'Status skill belum tersimpan.');await loadUserData(actor);
+  };
+
   const updateSkillStage = async (skillId: string, stage: number) => {
     const res = await fetch('/api/skills/progress', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({skillId,currentStage:stage})});
     const result=await res.json();if(!res.ok)throw new Error(result.error || 'Progres gagal disimpan');
     await loadUserData(currentUser!.id);
   };
 
-  // Auto-rotating session calculation
-  const getTodaySession = (): WorkoutSession => {
-    const selectedIds =
-      library?.sessionIds && library.sessionIds.length > 0
-        ? library.sessionIds
-        : (product.preferences.goal==='skills'?[...product.preferences.skills.filter(id=>product.preferences.experience!=='new'||id!=='front-lever').map(id=>sessions.find(s=>s.skillId===id&&s.stageNumber===getSkillProgress(id).currentStage)?.id).filter((id):id is string=>!!id),'s1','s2','s_legs_10']:product.preferences.goal==='strength'?['s1','s2','s_legs_10']:['s_legs_10','s2','s1']);
-    const compatible=selectedIds.filter(id=>sessionEquipment(id).every(e=>product.preferences.equipment.includes(e)));
-    const userSessionIds = (compatible.length?compatible:['s_legs_10']).filter(id=>{const session=sessions.find(s=>s.id===id);return session && canTrain(session,product.testTier) && (!session.skillId || !session.stageNumber || session.stageNumber <= getSkillProgress(session.skillId).currentStage)});
-    if(!userSessionIds.length)return sessions.find(s=>s.id==='s_legs_10') || sessions[0];
-
-    if (logs.length === 0) {
-      const first = sessions.find((s) => s.id === userSessionIds[0]);
-      return first || sessions[0];
-    }
-
-    const sortedLogs = [...logs].sort((a, b) => (b.tanggal > a.tanggal ? 1 : -1));
-    const lastSessionId = sortedLogs[0].sessionId;
-    const currentIndex = userSessionIds.indexOf(lastSessionId);
-
-    let nextIndex = 0;
-    if (currentIndex !== -1) {
-      nextIndex = (currentIndex + 1) % userSessionIds.length;
-    }
-
-    const nextSessionId = userSessionIds[nextIndex];
-    return sessions.find((s) => s.id === nextSessionId) || sessions[0];
-  };
-
-  const todaySession = getTodaySession();
+  const recommendation = recommendWorkouts({sessions,state:product,logs,stageFor:id=>getSkillProgress(id).currentStage,savedIds:library?.sessionIds})[0] || null;
+  // Legacy consumers still receive a session; Home exposes no-match explicitly instead of claiming a match.
+  const todaySession = recommendation?.session || sessions.find(s=>s.id==='s_legs_10') || sessions[0];
 
   const getSessionById = (id: string): WorkoutSession | undefined => {
     const session=sessions.find((s) => s.id === id);
@@ -271,9 +253,11 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
         streak,
         reminder,
         todaySession,
+        recommendation,
         skillProgressList,
         getSkillProgress,
         updateSkillStage,
+        completeSkill,
         saveLibrary,
         saveActiveWorkout,
         clearActiveWorkout,

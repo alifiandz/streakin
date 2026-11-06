@@ -38,6 +38,7 @@ export interface UserSkillProgress {
   skillId: string;
   currentStage: number; // 1 to 5
   bestHoldSec: number; // detik
+  completedAt?: string; // final-stage evidence + explicit self confirmation
   updatedAt?: string;
 }
 

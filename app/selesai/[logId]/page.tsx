@@ -244,11 +244,11 @@ export default function WorkoutDonePage() {
         {/* Action CTAs - Area sentuh min 48px */}
         <div className="space-y-2">
           <Link
-            href="/skills"
+            href={currentLog.skillFocus?`/skills/${currentLog.skillFocus}`:"/progress"}
             className="w-full btn-brand min-h-[48px] py-3 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#FF7A03]/20 active:scale-98 transition-all"
           >
             <Award className="w-4 h-4" />
-            <span>Lihat Progres di Katalog Skill</span>
+            <span>Tinjau Progres & Langkah Berikutnya</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
           </Link>
           <Link

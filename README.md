@@ -53,3 +53,7 @@ Final hosting remains Jagoan Hosting/Webuzo at streakin.my.id. No DNS or product
 Home now previews actual exercise targets, recommendation reasons, required equipment, beginner actions and the active skill milestone. Skills use compact progression panels with clickable stage previews rather than catalogue covers. Workout cards use purpose, difficulty, duration, sets, equipment and exercise-order previews, with goal/equipment filtering. Equipment is derived from every exercise; recommended sessions no longer assume an unlisted support is available. Exact Elbow Lever art is still absent from the supplied library; misleading presenter/other-pose images are not used for that skill.
 
 The current interface uses Indonesian labels while retaining established exercise and tier names. See docs/TRAINING_UX_REFINEMENT.md for implementation and testing notes.
+
+## Product completeness
+
+See [the feature inventory, decisions, prioritized roadmap and verification limits](docs/PRODUCT_COMPLETENESS.md). The latest pass connects optional self-assessment/time preferences, shared recommendations, a dedicated exercise library and explicit final-stage completion without replacing the visual design or existing browser data.

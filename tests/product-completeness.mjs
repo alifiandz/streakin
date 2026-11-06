@@ -1,0 +1,27 @@
+import {buildSync} from 'esbuild';import vm from 'node:vm';import assert from 'node:assert/strict';import {webcrypto} from 'node:crypto';
+const c={Response,URL,TextEncoder,crypto:webcrypto,window:{fetch},localStorage:{getItem:k=>mem.get(k)||null,setItem:(k,v)=>mem.set(k,v)}};const mem=new Map();vm.createContext(c);
+const load=(path,name)=>vm.runInContext(buildSync({entryPoints:[path],bundle:true,write:false,platform:'browser',format:'iife',globalName:name}).outputFiles[0].text,c);
+load('prototype/local-api.ts','API');load('v3/recommendations.ts','Recommendations');load('v3/catalog.ts','Catalog');
+async function api(path,body){const r=await c.window.fetch('/api/'+path,body===undefined?undefined:{method:'POST',body:JSON.stringify(body)});return {status:r.status,...await r.json()};}
+await api('auth/register',{nama:'Journey',email:'journey@example.com',kataSandi:'long-secret-pass'});
+let state=(await api('v3/state')).state;assert.equal(state.preferences.timeMinutes,15);assert.equal(state.preferences.assessment.plank,'unknown','Legacy-safe defaults');
+state=(await api('v3/preferences',{preferences:{...state.preferences,timeMinutes:10,assessment:{plank:'under15',pushups:'0to4'},skills:['handstand'],goal:'skills',equipment:['floor','wall','parallettes','support']}})).state;
+const sessions=c.Catalog.SEED_SESSIONS;const recommend=overrides=>c.Recommendations.recommendWorkouts({sessions,state,logs:[],stageFor:()=>1,...overrides});
+let choices=recommend({});assert.ok(choices.length);assert.ok(choices.every(r=>r.session.durasiMenit<=10&&!r.session.skillId&&!r.session.exercises.some(e=>e.exerciseId==='ex7')),'Time and ability apply together');
+assert.equal((await api('v3/preferences',{preferences:{...state.preferences,timeMinutes:7}})).status,400);assert.equal((await api('v3/preferences',{preferences:{...state.preferences,assessment:{plank:'invented',pushups:'0to4'}}})).status,400);
+state.preferences={...state.preferences,timeMinutes:30,experience:'experienced',assessment:{plank:'over30',pushups:'over10'},skills:['l-sit']};state.testTier='pro';
+const skill=sessions.find(s=>s.id==='s_lsit_1');const shortLog={id:'actual',sessionId:skill.id,tanggal:'2026-11-07',setsCompleted:skill.exercises.flatMap(e=>Array.from({length:e.sets},(_,i)=>({exerciseId:e.exerciseId,noSet:i+1,nilai:1,selesai:true}))),durasiDetik:100};
+choices=recommend({logs:[shortLog]});assert.equal(choices[0].session.id,skill.id);assert.equal(choices[0].repeat,true,'Pro suggests repeating unmet targets, without unlocking stages');
+assert.equal(recommend({sessions:[skill],state:{...state,preferences:{...state.preferences,equipment:['floor']}}}).length,0,'No silent equipment fallback');
+// Legacy Front Lever alias is gated for both custom creation and workout admission.
+assert.equal((await api('v3/routines',{nama:'Old alias',exercises:[{exerciseId:'ex6',sets:1,target:10,unit:'detik',istirahatDetik:20}]})).status,400);
+assert.equal((await api('skills/progress',{skillId:'l-sit',action:'complete',confirmed:true})).status,400);
+for(let stage=2;stage<=5;stage++)assert.ok((await api('skills/progress',{skillId:'l-sit',currentStage:stage})).success);
+assert.equal((await api('skills/progress',{skillId:'l-sit',action:'complete',confirmed:true})).status,400,'Stage 5 alone is not completion evidence');
+const final=sessions.find(s=>s.id==='s_lsit_5');const sets=final.exercises.flatMap(e=>Array.from({length:e.sets},(_,i)=>({exerciseId:e.exerciseId,noSet:i+1,valueLogged:e.target})));assert.ok((await api('workout-logs',{sessionId:final.id,completionKey:'final-evidence',durasiDetik:120,sets})).success);
+assert.equal((await api('skills/progress',{skillId:'l-sit',action:'complete',confirmed:false})).status,400);
+let completed=await api('skills/progress',{skillId:'l-sit',action:'complete',confirmed:true});const stamp=completed.data.find(p=>p.skillId==='l-sit').completedAt;assert.ok(stamp);
+assert.equal((await api('skills/progress',{skillId:'l-sit',action:'complete',confirmed:true})).data.find(p=>p.skillId==='l-sit').completedAt,stamp,'Confirmation is idempotent');
+const backup=(await api('backup')).data;assert.equal(backup.product.preferences.timeMinutes,10);assert.equal(backup.skills[0].completedAt,stamp);assert.ok((await api('backup',backup)).success);assert.equal((await api('skills/progress')).data[0].completedAt,stamp);
+assert.ok((await api('skills/progress',{skillId:'l-sit',action:'reopen'})).success);assert.ok(!(await api('skills/progress')).data[0].completedAt);assert.equal((await api('workout-logs')).data.length,1,'Reopening never deletes training evidence');
+console.log('PASS assessment migration/validation, time+equipment+ability recommendations, no-match, Pro repeat, legacy specialization gate, evidence-backed final confirmation, idempotency and backup/restore.');
