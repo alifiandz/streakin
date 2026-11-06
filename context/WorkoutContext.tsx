@@ -183,9 +183,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       library?.sessionIds && library.sessionIds.length > 0
         ? library.sessionIds
         : (product.preferences.goal==='skills'?[...product.preferences.skills.filter(id=>product.preferences.experience!=='new'||id!=='front-lever').map(id=>sessions.find(s=>s.skillId===id&&s.stageNumber===getSkillProgress(id).currentStage)?.id).filter((id):id is string=>!!id),'s1','s2','s_legs_10']:product.preferences.goal==='strength'?['s1','s2','s_legs_10']:['s_legs_10','s2','s1']);
-    const compatible=selectedIds.filter(id=>library?.sessionIds?.length||sessionEquipment(id).every(e=>product.preferences.equipment.includes(e)));
+    const compatible=selectedIds.filter(id=>sessionEquipment(id).every(e=>product.preferences.equipment.includes(e)));
     const userSessionIds = (compatible.length?compatible:['s_legs_10']).filter(id=>{const session=sessions.find(s=>s.id===id);return session && canTrain(session,product.testTier) && (!session.skillId || !session.stageNumber || session.stageNumber <= getSkillProgress(session.skillId).currentStage)});
-    if(!userSessionIds.length)return sessions.find(s=>s.id==='s1') || sessions[0];
+    if(!userSessionIds.length)return sessions.find(s=>s.id==='s_legs_10') || sessions[0];
 
     if (logs.length === 0) {
       const first = sessions.find((s) => s.id === userSessionIds[0]);

@@ -1,3 +1,4 @@
+import {workoutEquipment} from './training-meta';
 import {SEED_SKILLS,SEED_EXERCISES,SEED_SESSIONS} from '../lib/seedData';
 // Exact Orange Guy poses only. A missing straddle view remains a source link.
 const stages=[
@@ -22,6 +23,6 @@ export const requirements:Record<string,{equipment:string[];prerequisite:string}
  'elbow-lever':{equipment:['floor'],prerequisite:'Plank terkontrol dan pergelangan nyaman dalam posisi tumpuan.'},
  'front-lever':{equipment:['bar'],prerequisite:'Active hang dan tarikan dasar yang terkontrol pada palang kokoh.'},
 };
-export function sessionEquipment(id:string){const s=SEED_SESSIONS.find(s=>s.id===id);if(s?.skillId)return requirements[s.skillId]?.equipment||['floor'];return s?.exercises.some(e=>['ex1','ex2'].includes(e.exerciseId))?['floor','parallettes']:s?.exercises.some(e=>e.exerciseId==='ex8')?['floor','support']:['floor'];}
+export function sessionEquipment(id:string){const session=SEED_SESSIONS.find(s=>s.id===id);return session?workoutEquipment(session):['floor'];}
 
 const scapular=SEED_EXERCISES.find(e=>e.id==='ex24');if(scapular)scapular.nama='Scapular Push-up';

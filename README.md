@@ -1,6 +1,6 @@
 # Streakin V3
 
-A redesigned calisthenics prototype built on the existing React/Vite application. The active V3 branch is `streakin-v3`. The live V2 site has not been replaced; the user's brief requires confirming the publishing workflow first.
+A redesigned calisthenics prototype built on the existing React/Vite application. The active V3 branch is `streakin-v3`. The user selected the existing Site for publication, so V3 and subsequent refinements use the current StreakIn URL and preserve its access policy.
 
 ## Run and verify
 
@@ -48,3 +48,8 @@ Only the user's Orange Dude assets are displayed. No new stock or real-person ph
 - `docs/V3_DEPLOYMENT.md`: confirmation required before replacing V2 or creating a separate private preview.
 
 Final hosting remains Jagoan Hosting/Webuzo at streakin.my.id. No DNS or production hosting changes have been made.
+
+## Latest training-first refinement
+Home now previews actual exercise targets, recommendation reasons, required equipment, beginner actions and the active skill milestone. Skills use compact progression panels with clickable stage previews rather than catalogue covers. Workout cards use purpose, difficulty, duration, sets, equipment and exercise-order previews, with goal/equipment filtering. Equipment is derived from every exercise; recommended sessions no longer assume an unlisted support is available. Exact Elbow Lever art is still absent from the supplied library; misleading presenter/other-pose images are not used for that skill.
+
+The current interface uses Indonesian labels while retaining established exercise and tier names. See docs/TRAINING_UX_REFINEMENT.md for implementation and testing notes.

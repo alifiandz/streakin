@@ -1,12 +1,7 @@
-# V3 review and deployment workflow
+# Current publication workflow
 
-The user's V3 brief says: “Do not overwrite the live version without confirming the intended deployment workflow.” No V3 deployment or source push has been made.
+The user explicitly selected “current” after reviewing V3. Publish updates to the existing private StreakIn Site at https://streakin-prototype-v2.smalhi2025.chatgpt.site, preserving its project identity and access policy. Do not create another Site or request the same publishing confirmation again for authorized refinements.
 
-- Live V2 remains: https://streakin-prototype-v2.smalhi2025.chatgpt.site
-- Existing Sites project identity is retained in .openai/hosting.json.
-- V3 is built on local branch `streakin-v3`. The review archive contains the static production build and the delivery notes.
-- Option A, after explicit confirmation: push the reviewed V3 source to the existing Site's configured branch, package the matching build, save a version and publish privately while preserving its current access.
-- Option B, after confirmation: create a separate private V3 preview Site, bind its own identity/source and publish there, retaining V2 for comparison. Do not reuse the V2 project ID for a new Site.
-- Jagoan Hosting/Webuzo and streakin.my.id are the eventual production target. They have not been configured or changed. Confirm the plan's Node/database support before using the server enforcement adapter.
+The initial V3 review constraint was satisfied by building/testing a reviewable result and obtaining the user's workflow choice. V3 was published at source commit d49a77318132f1b0acfe26f5dc7f1c6607c1477f. Subsequent source updates are built, tested, pushed to the configured repository branch, packaged and published to the same Site.
 
-The static review build is a working local prototype; it is not a paid production service. Deploying the SQLite module requires a verified authentication/API adapter, durable private storage and a compatible server runtime. AI/billing/cloud synchronization remain disabled until their integrations are implemented.
+Jagoan Hosting/Webuzo at streakin.my.id remains the eventual production target. DNS, paid billing, cloud sync, Google OAuth and real AI analysis are not configured by this prototype publication. The independent server entitlement adapter still requires authenticated API/database integration before commercial use.

@@ -14,7 +14,7 @@ export default function Builder(){
  if(routineId&&!existing)return <Page title="Rutinitas tidak ditemukan"><Link href="/workouts" className="v3-text-link">Kembali ke latihan</Link></Page>;
  function update(index:number,key:string,value:number){setItems(old=>old.map((item,i)=>i===index?{...item,[key]:value}:item));}
  function move(index:number,delta:number){setItems(old=>{const next=[...old];[next[index],next[index+delta]]=[next[index+delta],next[index]];return next;});}
- return <Page title={existing?'Edit rutinitas':'Susun rutinitasmu'} eyebrow="Workout builder" description="Pilih gerakan, susun urutan, lalu atur set, target dan istirahat. Perkiraan durasi mengikuti susunanmu.">
+ return <Page title={existing?'Edit rutinitas':'Susun rutinitasmu'} eyebrow="Penyusun rutinitas" description="Pilih gerakan, susun urutan, lalu atur set, target dan istirahat. Perkiraan durasi mengikuti susunanmu.">
   {atLimit&&<ProPrompt title="Satu rutinitas sudah tersimpan" description="Free tetap bisa mengedit dan melatih rutinitas yang ada tanpa batas sesi. Pro membuka lebih banyak rutinitas tersimpan."/>}
   <div className="v3-split"><form onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');try{const result=await request('routines',{id:existing?.id,nama:name,exercises:items});router.push(`/workouts/${result.routine.id}`);}catch(e){setError(e instanceof Error?e.message:'Rutinitas belum tersimpan.');}finally{setBusy(false);}}}>
    <label className="v3-field"><span>Nama rutinitas</span><input value={name} onChange={e=>setName(e.target.value)} required minLength={2} maxLength={80} placeholder="Contoh: Core sore hari"/></label>
