@@ -35,3 +35,12 @@ Google sign-in preparation: [setup and acceptance checks](GOOGLE_SIGN_IN_SETUP.m
 Use only the user's Orange Guy images for all app illustrations. Do not add photos, stock art, alternate characters or generated substitute poses. The uploaded StreakIn SI logo is the approved brand replacement; at this revision its image bytes have not reached the execution workspace, so the existing brand mark is retained pending the actual file. Do not trace or approximate it.
 
 Lower-section references: the user-supplied Claud composition (playful stickers and character-led sections), https://en.duolingo.com/ (mascot-led explanations), and https://www.headspace.com/app (clear product sections and focused actions). Reference graphics and claims are not reused.
+
+## Dashboard and history refinements
+The original landing badge is content-width and centered. Ambient shapes and Orange Guy presentation poses move gently; prefers-reduced-motion disables the animations.
+
+Beranda places the next session first, followed by four training metrics, a seven-day minutes chart, current skill stages, recent sessions and saved workouts. Riwayat adds a 28-day activity calendar, focus distribution, date-range and text filters, and native expandable per-set records.
+
+Only the explicit Rizky demo account (`usr_demo_1`) receives illustrative sample data: 12 sessions spanning 25 days, a populated Library and sample skill progress. A version marker prevents repeated seeding. Existing demo logs/library/progress are preserved when present; personal profiles never receive samples. Both screens label demo content clearly. These are device-local prototype records.
+
+Verified through type checking, production build, account/API tests, route interaction tests and compiled-bundle DOM tests, including existing-empty-demo migration, no duplicate seeding, personal-account isolation, history filters and accordion closing. Live browser visual QA remains unavailable in this environment.

@@ -1,7 +1,8 @@
+import { createDemoTraining } from './demo-data';
 import { SEED_SESSIONS, SEED_SKILLS } from '../lib/seedData';
 import { getLocalDateString } from '../src/utils/storage';
 const nativeFetch=window.fetch.bind(window);export const KEY='streakin_training_v2';
-type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[]};
+type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[];demoSeedVersion?:number};
 type DB={version:2;active:string|null;profiles:Profile[]};
 function read():DB{
  const raw=localStorage.getItem(KEY);if(!raw)return {version:2,active:null,profiles:[]};
@@ -12,8 +13,19 @@ function read():DB{
   const logs=(Array.isArray(p.logs)?p.logs:[]).filter((x:any)=>x&&typeof x.id==='string').map((x:any)=>({...x,sets:(Array.isArray(x.sets)?x.sets:Array.isArray(x.setsCompleted)?x.setsCompleted:[]).filter((set:any)=>set&&typeof set.exerciseId==='string').map((set:any)=>({...set,valueLogged:Number(set.valueLogged??set.nilai)||0}))}));
   return {...p,nama:typeof p.nama==='string'?p.nama:'Kawan',email:typeof p.email==='string'?p.email:'',library,skills,logs};
  });
+ let demoMigrated=false;
+ for(const profile of profiles){
+  if(profile.id==='usr_demo_1'&&!profile.demoSeedVersion){
+   const demo=createDemoTraining(profile.id);
+   if(!profile.logs.length)profile.logs=demo.logs;
+   if(!profile.library)profile.library=demo.library;
+   if(!profile.skills.length)profile.skills=demo.skills;
+   profile.demoSeedVersion=1;demoMigrated=true;
+  }
+ }
  const cleaned={version:2 as const,active:typeof d.active==='string'?d.active:null,profiles};
  if(JSON.stringify(cleaned)!==raw){try{if(!localStorage.getItem(KEY+'_recovery_snapshot'))localStorage.setItem(KEY+'_recovery_snapshot',raw)}catch{}}
+ if(demoMigrated)localStorage.setItem(KEY,JSON.stringify(cleaned));
  return cleaned;
 }
 function save(d:DB){localStorage.setItem(KEY,JSON.stringify(d))}
@@ -29,7 +41,7 @@ if(url==='/api/auth/register'||url==='/api/auth/login'){
  const email=String(b.email||'').trim().toLowerCase(),pass=String(b.kataSandi||'');ensure(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),'Format email tidak valid.');
  let p=db.profiles.find(x=>x.email===email);
  if(url.endsWith('register')){ensure(String(b.nama||'').trim().length>0,'Nama wajib diisi.');ensure(pass.length>=8,'Kata sandi minimal 8 karakter.');ensure(!p,'Email sudah terdaftar di perangkat ini.');const salt=crypto.randomUUID();p={id:crypto.randomUUID(),nama:String(b.nama).trim().slice(0,80),email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}else{
- if(!p&&email==='rizky@sma11.sch.id'&&pass==='rahasia123'){const salt=crypto.randomUUID();p={id:'usr_demo_1',nama:'Rizky',email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}
+ if(!p&&email==='rizky@sma11.sch.id'&&pass==='rahasia123'){const salt=crypto.randomUUID();p={id:'usr_demo_1',nama:'Rizky',email,salt,verifier:await password(pass,salt),...createDemoTraining('usr_demo_1')};db.profiles.push(p)}
  ensure(p&&await password(pass,p.salt)===p.verifier,'Email atau kata sandi salah. Akun perangkat lain memerlukan pemulihan cadangan.');}
  const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
 if(!user)return reply({success:false,error:'Masuk terlebih dahulu.'},401);

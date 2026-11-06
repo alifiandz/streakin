@@ -34,12 +34,13 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--bg)] text-[var(--text)] transition-colors overflow-x-hidden">
+    <div className="landing-motion min-h-[100dvh] bg-[var(--bg)] text-[var(--text)] transition-colors overflow-x-hidden">
       <MobileContainer maxWidth="6xl" withBottomNav={false}>
+        <div className="hero-ambient" aria-hidden="true"><span/><span/><span/></div>
         {/* Hero Section */}
         <section id="landing-hero" aria-labelledby="landing-title" className="min-h-[calc(100svh-4rem)] flex flex-col justify-center pt-10 pb-12 sm:pt-14 sm:pb-16 text-center max-w-2xl mx-auto px-1">
           {/* Sapaan Pelajar SMA/SMK */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--card)] border border-[var(--line)] text-xs font-semibold text-[#FF7A03] mb-4 shadow-sm">
+          <div className="hero-badge self-center w-fit mx-auto inline-flex justify-center items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--card)] border border-[var(--line)] text-xs font-semibold text-[#FF7A03] mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
             <span>Kawan latihan kalistenik buat anak SMA / SMK</span>
           </div>
@@ -59,7 +60,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center justify-center gap-2.5 w-full max-w-md mx-auto">
             <Link
               href="/akun?tab=register"
-              className="w-full btn-brand min-h-[50px] py-3.5 px-6 text-sm sm:text-base font-bold shadow-lg shadow-[#FF7A03]/20 flex items-center justify-center gap-2 active:scale-98 transition-all"
+              className="hero-cta w-full btn-brand min-h-[50px] py-3.5 px-6 text-sm sm:text-base font-bold shadow-lg shadow-[#FF7A03]/20 flex items-center justify-center gap-2 active:scale-98 transition-all"
             >
               <span>Mulai Latihan Sekarang</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />

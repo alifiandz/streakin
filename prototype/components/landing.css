@@ -38,3 +38,18 @@
  .landing-session-card { padding:1rem; box-shadow:4px 4px 0 #0f1114; }
  .landing-bridge { font-size:.6875rem; gap:.5rem; }
 }
+/* Subtle ambient motion keeps the original text-only hero intact. */
+.landing-motion { position:relative; isolation:isolate; }
+.hero-ambient { position:absolute; top:0; left:0; right:0; height:calc(100svh - 4rem); overflow:hidden; z-index:-1; pointer-events:none; }
+.hero-ambient span { position:absolute; width:180px; height:180px; border:1px solid #ff7a0312; border-radius:50%; animation:hero-drift 15s ease-in-out infinite alternate; }
+.hero-ambient span:nth-child(1) { top:14%; left:5%; }
+.hero-ambient span:nth-child(2) { right:4%; bottom:12%; width:260px; height:260px; animation-delay:-6s; }
+.hero-ambient span:nth-child(3) { left:22%; bottom:2%; width:12px; height:12px; background:#ff7a0326; border:0; animation-delay:-3s; }
+.hero-badge { flex-shrink:0; text-align:center; }
+.hero-badge>span { text-align:center; }
+.hero-cta { transition:transform .2s,box-shadow .2s; }
+.hero-cta:hover { transform:translateY(-2px); box-shadow:0 10px 32px #ff7a0333; }
+.landing-path-art>img,.landing-habit-art>img { animation:orange-bob 7s ease-in-out infinite; }
+@keyframes hero-drift { from { transform:translate3d(0,0,0); } to { transform:translate3d(24px,-28px,0); } }
+@keyframes orange-bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-7px); } }
+@media(prefers-reduced-motion:reduce) { .hero-ambient span,.landing-path-art>img,.landing-habit-art>img { animation:none; } .hero-cta:hover { transform:none; } }

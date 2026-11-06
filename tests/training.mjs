@@ -27,3 +27,13 @@ assert.ok((await api('backup',backup)).success);assert.notEqual((await api('work
 assert.equal((await api('backup',{format:'bad',logs:[]})).status,400);
 await api('auth/logout',{});assert.ok((await api('auth/login',{email:'a@example.com',kataSandi:'test-password-123'})).success);assert.equal((await api('workout-logs')).data.length,1);
 console.log('PASS: registration/login, hashed verifier, isolated profiles, persisted library, stage bounds, validated completion, idempotency, local date, save failures, backup/restore, logout.');
+await api('auth/logout',{});
+assert.ok((await api('auth/login',{email:'rizky@sma11.sch.id',kataSandi:'rahasia123'})).success);
+const demoLogs=(await api('workout-logs')).data;
+assert.equal(demoLogs.length,12,'Demo gets illustrative history');
+assert.ok((await api('library')).data.sessionIds.length>0,'Demo has a usable program');
+assert.equal((await api('skills/progress')).data.find(s=>s.skillId==='l-sit').currentStage,2);
+assert.equal((await api('workout-logs')).data.length,12,'Repeated reads do not duplicate examples');
+await api('auth/logout',{});await api('auth/login',{email:'a@example.com',kataSandi:'test-password-123'});
+assert.equal((await api('workout-logs')).data.length,1,'Personal records are not seeded');
+console.log('PASS demo isolation: 12 sample logs, usable library, stage progress, no reseeding or personal-account pollution.');
