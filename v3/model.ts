@@ -1,4 +1,6 @@
 import type {WorkoutSession} from '../src/types';
+export const trainingTimeOptions=[5,10,15,20,30,45,60] as const;
+export const quickSessionIds=['s_quick_core_5'];
 export type Tier='free'|'pro';
 export interface Assessment {plank:'unknown'|'under15'|'15to30'|'over30';pushups:'unknown'|'0to4'|'5to10'|'over10';}
 export interface Preferences {timeMinutes:number;assessment:Assessment;experience:'new'|'some'|'experienced';goal:'consistency'|'strength'|'skills';skills:string[];equipment:string[];frequency:number;onboarded:boolean;timeZone:string;}

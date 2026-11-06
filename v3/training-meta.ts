@@ -10,6 +10,7 @@ export function exerciseEquipment(id:string):string[]{
 export function workoutEquipment(session:WorkoutSession){return [...new Set(session.exercises.flatMap(e=>exerciseEquipment(e.exerciseId)))];}
 export function missingEquipment(session:WorkoutSession,available:string[]){return workoutEquipment(session).filter(id=>!available.includes(id));}
 const presets:Record<string,{goal:string;category:string;difficulty:string;short:string}>={
+ s_quick_core_5:{goal:'Aktivasi inti tubuh dalam sesi singkat',category:'core',difficulty:'Pemula',short:'Inti tubuh'},
  s1:{goal:'Kekuatan dada, bahu, dan trisep',category:'push',difficulty:'Dasar',short:'Dorong'},
  s2:{goal:'Kontrol inti tubuh dan tumpuan bahu',category:'core',difficulty:'Dasar',short:'Inti tubuh'},
  s_legs_10:{goal:'Fondasi kaki dan kestabilan tubuh',category:'legs',difficulty:'Pemula',short:'Kaki'},

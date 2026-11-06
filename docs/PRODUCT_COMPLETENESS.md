@@ -99,3 +99,9 @@ Run `npm run typecheck`, `npm run build`, `npm test`, `git diff --check`.
 Added tests: migration/validation of optional assessment/time; time + gear + ability eligibility; Pro repeat after unmet actual targets; explicit no-match; legacy Pro alias denial; final-stage evidence/confirmation/idempotency/reopen; backup/restore; assessment forms → Home recommendation → library search/type reset → tutorial → builder handoff; full nine-set final-stage workout → completion → confirmation → Progress → return refresh. Existing Free/Pro workout, timers, checkpoint/recovery, downgrade, routine limits, auth forms, isolation and data failure tests remain.
 
 Test fixtures are isolated in test storage, never seeded into the application. A compiled-bundle DOM harness tests actual event handlers but is not a real rendering browser. Managed browser preview attempt failed with `listen EPERM 127.0.0.1:4173`; preview status stopped. Per Sites guidance, no sandbox/network bypass or substitute browser is used. Mobile/desktop screenshots and visual layout remain unverified.
+
+## Dashboard time selector follow-up
+
+Beranda now exposes “Aku punya … menit” immediately above its recommendation: 5, 10, 15, 20, 30, 45 and 60 minutes. The time-only API updates just this preference, preserving onboarding status, assessment and other settings. Choice persists across refresh and is shared with Profile and Pro planning. An admitted active workout is never replaced by a new time selection.
+
+Five minutes now selects the Free `Core Singkat 5` session: two sets each of Dead Bug and a short Plank, with rest and review guidance for warm-up, cooldown and easier variation. It uses the existing player, draft recovery, real completion logs and statistics. The original three preset programs are retained. Tests cover the selector, 5-minute admission/completion, changing time during a draft, return persistence and invalid durations. Durations remain estimates, not deadlines.
