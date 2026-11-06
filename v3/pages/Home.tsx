@@ -1,17 +1,19 @@
-import React,{useState} from 'react';
+import React from 'react';
 import Link from 'next/link';
 import {ArrowRight,Play,RotateCcw,Check,Clock,Flag} from 'lucide-react';
 import {useAuth} from '@/context/AuthContext';
 import {useWorkout} from '@/context/WorkoutContext';
 import {useProduct} from '../ProductContext';
 import {SEED_SKILLS,SEED_SESSIONS,SEED_EXERCISES} from '../catalog';
-import {isProSkill,trainingTimeOptions} from '../model';
+import {guidedInfo} from '../guided-training';
+import {isProSkill} from '../model';
 import {ActivityChart} from '@/prototype/components/TrainingInsights';
-import {Page,SectionTitle,Message} from '../components/UI';
+import {Page,SectionTitle} from '../components/UI';
+import {GuidedQuestionnaire} from '../components/GuidedQuestionnaire';
 import {SkillMilestones} from '../components/SkillMilestones';
 import {workoutMeta,equipmentLabels,shortDuration} from '../training-meta';
 export default function Home(){
- const {currentUser}=useAuth();const {state,request}=useProduct();const [savingTime,setSavingTime]=useState(false);const [timeError,setTimeError]=useState('');const {activeWorkout,todaySession,recommendation,logs,streak,getSkillProgress}=useWorkout();
+ const {currentUser}=useAuth();const {state}=useProduct();const {activeWorkout,todaySession,recommendation,logs,streak,getSkillProgress}=useWorkout();
  const active=activeWorkout?SEED_SESSIONS.find(s=>s.id===activeWorkout.sessionId)||state.routines.find(s=>s.id===activeWorkout.sessionId):null;
  const session=active||todaySession,meta=workoutMeta(session);
  const goal=SEED_SKILLS.find(s=>state.preferences.skills.includes(s.id)&&(!isProSkill(s.id)||state.testTier==='pro'))||SEED_SKILLS[0];
@@ -19,7 +21,7 @@ export default function Home(){
  const recent=[...logs].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).slice(0,3);
  const newAthlete=logs.length===0;
  const currentSession=SEED_SESSIONS.find(s=>s.skillId===goal.id&&s.stageNumber===progress.currentStage);
- const skillSessions=logs.filter(l=>l.sessionId===currentSession?.id).length;
+ const skillSessions=logs.filter(l=>l.sessionId===currentSession?.id||guidedInfo(l.sessionId)?.skillId===goal.id&&guidedInfo(l.sessionId)?.stage===progress.currentStage).length;
  const recommendationReason=active?'Sesi terakhir belum tuntas. Lanjutkan dari set yang sudah kamu catat.':recommendation?.reason||'Belum ada sesi yang cocok dengan semua preferensimu.';
  const weekStart=new Date();weekStart.setDate(weekStart.getDate()-6);weekStart.setHours(0,0,0,0);
  const weekLogs=logs.filter(l=>new Date(l.tanggal+'T12:00:00')>=weekStart);
@@ -27,7 +29,7 @@ export default function Home(){
  const starterSteps=[{title:'Kenali titik awal',copy:'Tujuan, alat, dan pengalamanmu.',done:state.preferences.onboarded,href:'/onboarding',action:'Atur preferensi'}, {title:'Tuntaskan satu sesi',copy:'Catat hasil setiap set, bukan sekadar target.',done:logs.length>0,href:`/workouts/${session.id}`,action:'Tinjau sesi'}, {title:'Pilih ritme mingguan',copy:'Sisakan waktu istirahat di antaranya.',done:state.schedule.days.length>0,href:'/profile',action:'Atur jadwal'}];
  return <div className="training-home"><Page title={`Siap bergerak, ${currentUser?.nama||'Kawan'}?`} eyebrow="Ruang latihan" description={active?'Sesi yang belum selesai tetap menunggumu.':newAthlete?'Mulai dari satu sesi yang bisa kamu lakukan dengan terkontrol.':'Lihat langkah hari ini, lalu kembali ke tujuan yang sedang kamu bangun.'}>
   {!state.preferences.onboarded&&<Link href="/onboarding" className="home-preference-link">Latihan awal dipilih untuk area lantai. Sesuaikan tujuan dan alatmu →</Link>}
-  <section className="home-time-picker" aria-labelledby="training-time-heading"><div><p className="v3-eyebrow">Waktumu hari ini</p><h2 id="training-time-heading">Aku punya <span>{state.preferences.timeMinutes} menit.</span></h2><p>{active?'Pilihan waktu berlaku untuk sesi berikutnya. Sesi aktifmu tetap tersimpan.':'Pilih waktu luangmu. Kami pilih sesi sesuai alat dan kemampuanmu.'}</p></div><div><div className="v3-choice" role="group" aria-label="Waktu latihan hari ini" aria-busy={savingTime}>{trainingTimeOptions.map(minutes=><button key={minutes} disabled={savingTime} aria-pressed={state.preferences.timeMinutes===minutes} onClick={async()=>{if(minutes===state.preferences.timeMinutes)return;setSavingTime(true);setTimeError('');try{await request('training-time',{minutes});}catch(e){setTimeError(e instanceof Error?e.message:'Waktu belum tersimpan. Coba lagi.');}finally{setSavingTime(false);}}}>{minutes} menit</button>)}</div><p className="home-time-status" role="status">{savingTime?'Menyimpan pilihan…':`Pilihan ${state.preferences.timeMinutes} menit tersimpan untuk rekomendasi. Durasi sesi adalah perkiraan, termasuk jeda.`}</p>{timeError&&<Message error>{timeError}</Message>}</div></section>
+  <GuidedQuestionnaire/>
   <div className="home-training-layout">
    <section className="home-workout" aria-labelledby="recommended-workout"><div className="home-workout-top"><p className="v3-eyebrow">{active?'Lanjutkan sesi':'Rekomendasi hari ini'}</p>{(active||recommendation)&&<span className="v3-pill">{meta.difficulty}</span>}</div><h2 id="recommended-workout">{!active&&!recommendation?'Sesuaikan titik awalmu':session.nama}</h2>{(active||recommendation)&&<><p className="home-workout-goal">{meta.goal}</p><div className="workout-facts"><span><Clock className="w-3.5 h-3.5"/>{session.durasiMenit} menit</span><span>{meta.moves} gerakan</span><span>{meta.sets} set</span></div>
     </>}<p className="home-recommendation-reason">{recommendationReason}</p>

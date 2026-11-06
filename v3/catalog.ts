@@ -29,3 +29,7 @@ const scapular=SEED_EXERCISES.find(e=>e.id==='ex24');if(scapular)scapular.nama='
 
 // A real short session for the dashboard's five-minute choice; original presets remain intact.
 if(!SEED_SESSIONS.some(s=>s.id==='s_quick_core_5'))SEED_SESSIONS.push({id:'s_quick_core_5',nama:'Core Singkat 5',durasiMenit:5,fokus:'Pull dan core',exercises:[{exerciseId:'ex9',sets:2,target:4,unit:'reps',istirahatDetik:20},{exerciseId:'ex10',sets:2,target:10,unit:'detik',isIsometric:true,istirahatDetik:20}]});
+
+// Deterministic, stage-bound guided variants; no custom-routine slot is consumed.
+import {createGuidedSessions} from './guided-training';
+SEED_SESSIONS.push(...createGuidedSessions(SEED_SESSIONS).filter(s=>!SEED_SESSIONS.some(old=>old.id===s.id)));

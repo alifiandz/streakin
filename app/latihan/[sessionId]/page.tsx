@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useWorkout } from '@/context/WorkoutContext';
+import {guidedInfo} from '@/v3/guided-training';
+import {GuidedCoach} from '@/v3/components/GuidedCoach';
 import { SEED_EXERCISES } from '@/src/data/seedExercises';
 import { CompletedSet, ActiveWorkout } from '@/src/types';
 import { MobileContainer } from '@/components/layout/MobileContainer';
@@ -47,6 +49,9 @@ export default function WorkoutPlayerPage() {
   const [elapsedActiveSec,setElapsedActiveSec]=useState(0);
   const sessionTickRef=useRef(Date.now());
   const checkpointReady=useRef(false);
+  const guide=guidedInfo(sessionId);
+  const [guideWarmupDone,setGuideWarmupDone]=useState(false);
+  const [guideCooldownAt,setGuideCooldownAt]=useState<number|null>(null);
   const checkpointKey=`streakin_player_checkpoint_v3_${currentUser?.id}_${sessionId}`;
   const [actualValues,setActualValues]=useState<Record<string,number>>({});
   const lastFeedback=useRef<{value:number,time:number}|null>(null);
@@ -59,6 +64,7 @@ export default function WorkoutPlayerPage() {
     const restoredSets=matching?.completedSets||saved?.completedSets;setCompletedSets(Array.isArray(restoredSets)?restoredSets.filter((set:any)=>set&&typeof set.exerciseId==='string'&&Number.isFinite(set.nilai)&&Number.isInteger(set.noSet)):[]);
     setStartTime(matching?.mulai||saved?.startTime||new Date().toISOString());
     if(saved){
+      setGuideWarmupDone(saved.guideWarmupDone===true);setGuideCooldownAt(Number.isFinite(saved.guideCooldownAt)?saved.guideCooldownAt:null);
       const hold=Number.isFinite(saved.holdElapsed)?Math.max(0,Math.min(3600,saved.holdElapsed)):0;
       setHoldTimerElapsed(hold);holdTimerBaseSecRef.current=hold;
       setActualValues(saved.actualValues&&typeof saved.actualValues==='object'?saved.actualValues:{});
@@ -270,9 +276,9 @@ export default function WorkoutPlayerPage() {
   },[sessionPaused,isFinishing]);
   useEffect(()=>{
     if(!checkpointReady.current||!session||!currentUser||!startTime||isFinishing)return;
-    safeLocalStorage.setItem(checkpointKey,JSON.stringify({startTime,exerciseIndex,completedSets,actualValues,holdElapsed:holdTimerElapsed,restEnd:timerRunning?restTimerEndMsRef.current:null,restSeconds:timerSeconds,elapsedActiveSec}));
+    safeLocalStorage.setItem(checkpointKey,JSON.stringify({startTime,exerciseIndex,completedSets,actualValues,holdElapsed:holdTimerElapsed,restEnd:timerRunning?restTimerEndMsRef.current:null,restSeconds:timerSeconds,elapsedActiveSec,guideWarmupDone,guideCooldownAt}));
     if(!activeWorkout||activeWorkout.sessionId!==session.id)saveActiveWorkout({userId:currentUser.id,sessionId:session.id,mulai:startTime,exerciseIndex,completedSets});
-  },[startTime,exerciseIndex,completedSets,actualValues,holdTimerElapsed,timerRunning,timerSeconds,elapsedActiveSec,isFinishing]);
+  },[startTime,exerciseIndex,completedSets,actualValues,holdTimerElapsed,timerRunning,timerSeconds,elapsedActiveSec,isFinishing,guideWarmupDone,guideCooldownAt]);
 
   useEffect(()=>{
     if(!sessionPaused&&!showExitModal&&!tipModal)return;
@@ -337,6 +343,7 @@ export default function WorkoutPlayerPage() {
 
   // Handle set completion
   const handleCompleteSet = (setNumber: number, value: number) => {
+    if(guide&&(!guideWarmupDone||guideCooldownAt!==null))return;
     const entered=actualValues[currentExerciseData.id+':'+setNumber];
     const holdRecorded=entered??(isIsometricHold&&holdTimerElapsed>0?holdTimerElapsed:value);
     if (!Number.isFinite(holdRecorded) || holdRecorded <= 0 || holdRecorded > 3600 || (!isIsometricHold&&!Number.isInteger(holdRecorded))) { window.alert('Masukkan repetisi atau detik yang benar (1–3600).'); return; }
@@ -404,7 +411,8 @@ export default function WorkoutPlayerPage() {
   ).length;
 
   // Navigate to next exercise or finish session
-  const handleNextOrFinish = async () => {
+  const handleNextOrFinish = async (finishGuided=false) => {
+    if(guide&&!guideWarmupDone)return;
     if (isFinishing) return;
     if (setsDoneForThisExercise < currentSessionExercise.sets) { window.alert('Selesaikan semua set gerakan ini sebelum melanjutkan.'); return; }
     setTimerRunning(false);
@@ -427,6 +435,7 @@ export default function WorkoutPlayerPage() {
         });
       }
     } else {
+      if(guide&&!finishGuided){setGuideCooldownAt(elapsedActiveSec);setTimerRunning(false);setHoldTimerRunning(false);return;}
       // Finish Workout!
       setIsFinishing(true);
       try {
@@ -531,6 +540,8 @@ export default function WorkoutPlayerPage() {
         withBottomNav={false}
         className="pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]"
       >
+        {guide&&<GuidedCoach sessionId={session.id} elapsed={elapsedActiveSec} exercise={currentExerciseData} index={exerciseIndex} total={totalExercises} warmupDone={guideWarmupDone} onWarmupDone={()=>setGuideWarmupDone(true)} resting={timerRunning} restSeconds={timerSeconds} cooldownAt={guideCooldownAt} onFinish={()=>void handleNextOrFinish(true)} busy={isFinishing}/>}
+        <div hidden={!!guide&&(!guideWarmupDone||guideCooldownAt!==null)}>
         {/* Media Container (16:9 Illustration / Image dengan Safe Fallback & Uncropped View) */}
         <div className="relative mb-3 sm:mb-4">
           {isStageImage ? (
@@ -845,6 +856,7 @@ export default function WorkoutPlayerPage() {
             </button>
           </div>
         </div>
+        </div>
       </MobileContainer>
 
       {/* Sticky Bottom Action - Ergonomis satu jempol, safe-area bottom */}
@@ -852,8 +864,8 @@ export default function WorkoutPlayerPage() {
         <div className="max-w-xl mx-auto">
           <button
             type="button"
-            disabled={isFinishing}
-            onClick={handleNextOrFinish}
+            disabled={isFinishing||!!guide&&(!guideWarmupDone||guideCooldownAt!==null)}
+            onClick={()=>void handleNextOrFinish()}
             className="w-full btn-brand min-h-[50px] py-3.5 text-sm sm:text-base font-bold shadow-xl shadow-[#FF7A03]/20 flex items-center justify-center gap-2 active:scale-98 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {exerciseIndex < totalExercises - 1 ? (

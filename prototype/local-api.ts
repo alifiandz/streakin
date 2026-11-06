@@ -1,4 +1,5 @@
 import { productFor, productRequest, resolveSession, restoreProduct } from '../v3/api';
+import {guidedInfo} from '../v3/guided-training';
 import { canTrain } from '../v3/model';
 import { SEED_SESSIONS, SEED_SKILLS } from '../v3/catalog';
 import { getLocalDateString } from '../src/utils/storage';
@@ -49,7 +50,7 @@ if(url==='/api/skills/progress'){
   if(b.action==='complete'){
    ensure(old?.currentStage===5&&n===5&&b.confirmed===true,'Tuntaskan tahap terakhir dan konfirmasi kontrol teknik.');
    const final=SEED_SESSIONS.find(s=>s.skillId===b.skillId&&s.stageNumber===5);const target=final?.exercises[0];
-   ensure(final&&target&&user.logs.some(l=>!String(l.id).startsWith('demo-session-')&&l.sessionId===final.id&&l.sets.filter((x:any)=>x.exerciseId===target.exerciseId&&x.valueLogged>=target.target).length>=target.sets),'Catat satu sesi tahap terakhir yang mencapai target utama sebelum menyelesaikan jalur.');
+   ensure(final&&target&&user.logs.some(l=>!String(l.id).startsWith('demo-session-')&&(l.sessionId===final.id||guidedInfo(l.sessionId)?.skillId===final.skillId&&guidedInfo(l.sessionId)?.stage===5)&&l.sets.filter((x:any)=>x.exerciseId===target.exerciseId&&x.valueLogged>=target.target).length>=target.sets),'Catat satu sesi tahap terakhir yang mencapai target utama sebelum menyelesaikan jalur.');
    completedAt=completedAt||new Date().toISOString();
   }else if(b.action==='reopen'||n<5)completedAt=undefined;
   else ensure(!b.action,'Aksi progres tidak dikenal.');
