@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import {SkillCover} from '@/prototype/components/SkillCover';
 import Link from 'next/link';
 import {
   Award,
@@ -41,7 +42,7 @@ export default function SkillsCatalogPage() {
             const userProg = getSkillProgress(skill.id);
             const currentStageNum = userProg.currentStage || 1;
             const currentStageData = skill.stages.find((s) => s.stageNumber === currentStageNum) || skill.stages[0];
-            const progressPercent = Math.round((currentStageNum / skill.stages.length) * 100);
+            const progressPercent = Math.round(((currentStageNum - 1) / skill.stages.length) * 100);
 
             return (
               <div
@@ -55,6 +56,7 @@ export default function SkillsCatalogPage() {
                 />
 
                 <div>
+                  <SkillCover id={skill.id} name={skill.nama}/>
                   {/* Top Badges */}
                   <div className="flex items-center justify-between gap-2 mb-2 sm:mb-2.5">
                     <span

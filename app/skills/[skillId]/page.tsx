@@ -27,7 +27,7 @@ export default function SkillDetailPage() {
   const params = useParams();
   const router = useRouter();
   const skillId = (params?.skillId as string) || '';
-  const { getSkillProgress, updateSkillStage } = useWorkout();
+  const { getSkillProgress, updateSkillStage, library, saveLibrary } = useWorkout();
 
   const normalizedSkillId = skillId === 'front-lever' ? 'elbow-lever' : skillId;
   const skill = SEED_SKILLS.find((s) => s.id === normalizedSkillId) || SEED_SKILLS.find((s) => s.id === skillId);
@@ -91,6 +91,11 @@ export default function SkillDetailPage() {
             <span>{toastMessage}</span>
           </div>
         )}
+
+        <div className="mb-3 flex flex-wrap gap-2 items-center">
+          <Link href="/library" className="btn-outline min-h-[44px] px-4 flex items-center text-xs font-bold">← Library Skill</Link>
+          <button type="button" onClick={async()=>{try{await saveLibrary(library?.durasi||[],library?.fokus||[],Array.from(new Set([...(library?.sessionIds||[]),`s_${skill.id.replace('-','')}_${currentStageNum}`])));setToastMessage('Tahap aktif tersimpan di Library.');}catch(e){setToastMessage(e instanceof Error?e.message:'Library belum tersimpan.');}}} className="btn-outline min-h-[44px] px-4 text-xs font-bold">Simpan Tahap Aktif ke Library</button>
+        </div>
 
         {/* Skill Hero Header */}
         <div className="card-surface p-3 sm:p-6 border-[#2E3238] mb-3 sm:mb-6 relative overflow-hidden">
@@ -204,6 +209,7 @@ export default function SkillDetailPage() {
                       : 'bg-[#15171A] border-[#2E3238] opacity-50'
                   }`}
                 >
+                  {st.imageUrl && <img src={st.imageUrl} alt="" className="hidden sm:block w-full h-16 object-contain rounded-lg mb-1" loading="lazy"/>}
                   <div className="flex items-center justify-center">
                     {isPassed ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -284,6 +290,7 @@ export default function SkillDetailPage() {
                 aspectRatioClass="aspect-video max-h-[220px] sm:max-h-[300px]"
                 className="w-full h-full object-contain p-2 sm:p-4 drop-shadow-md"
               />
+              {selectedStageData.imageUrl?.startsWith('https:')&&<a href={movementReferences['elbow-lever'].url} target="_blank" rel="noreferrer" className="block text-[10px] text-[#8A929C] mt-2">Foto demonstrasi pada parallettes: Hybrid Calisthenics ↗</a>}
             </div>
 
             <div className="lg:col-span-7 space-y-3">

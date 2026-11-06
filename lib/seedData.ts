@@ -1266,3 +1266,12 @@ const squatArt=SEED_EXERCISES.find(e=>e.id==='ex26');if(squatArt)squatArt.imageU
 const wristPrep=SEED_EXERCISES.find(e=>e.id==='ex22');if(wristPrep){wristPrep.nama='Wrist Prep & Rock';wristPrep.imageUrl='/images/exercises/wrist-rock.png';wristPrep.langkah=['Mulai dari posisi merangkak, telapak tangan rata dan jari terbuka.','Condongkan tubuh sedikit ke depan untuk memberi beban ringan pada pergelangan.','Kembali perlahan dan ulangi dalam rentang yang nyaman.','Jaga napas teratur; jangan memaksakan sendi jika terasa nyeri.'];}
 const scapularPrep=SEED_EXERCISES.find(e=>e.id==='ex24');if(scapularPrep)scapularPrep.imageUrl='/images/exercises/push-up-high.png';
 const pikePrep=SEED_EXERCISES.find(e=>e.id==='ex25');if(pikePrep){pikePrep.nama='Elevated Pike Shoulder Stretch';pikePrep.imageUrl='/images/exercises/pike-stretch.png';pikePrep.langkah=['Berdiri menghadap tumpuan datar yang stabil dan tidak bergeser.','Letakkan kedua tangan pada tumpuan, lalu mundurkan kaki sambil menekuk pinggul.','Jaga lengan panjang dan turunkan dada perlahan dalam rentang yang nyaman.','Bernapas teratur. Tekuk sedikit lutut bila perlu.'];pikePrep.lebihMudah='Kurangi kedalaman tekukan pinggul dan tekuk sedikit lutut';pikePrep.lebihSulit='Tambah rentang perlahan tanpa menekan bahu secara paksa';}
+
+// Real demonstrations from the corresponding Hybrid Calisthenics progression.
+// Keep the original remote sources and show source attribution in the interface.
+const elbowReferencePhotos: Record<number,string> = {
+ 4: 'https://images.squarespace-cdn.com/content/v1/61bd05f1f151e77577ab467c/d0daeaa9-a364-446e-9f3a-8e76baf82957/Straddle%2B3.JPG',
+ 5: 'https://images.squarespace-cdn.com/content/v1/61bd05f1f151e77577ab467c/9c674d15-e905-4733-8bcf-5223364f592b/Full%2BElbow%2BLever.JPG'
+};
+for(const skill of SEED_SKILLS)if(skill.id==='elbow-lever')for(const stage of skill.stages)if(elbowReferencePhotos[stage.stageNumber])stage.imageUrl=elbowReferencePhotos[stage.stageNumber];
+for(const exercise of SEED_EXERCISES){if(exercise.id==='ex20')exercise.imageUrl=elbowReferencePhotos[4];if(exercise.id==='ex21')exercise.imageUrl=elbowReferencePhotos[5];}

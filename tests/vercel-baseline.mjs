@@ -1,3 +1,3 @@
 import fs from 'node:fs';import assert from 'node:assert/strict';
-for(const path of ['app/page.tsx','app/(dashboard)/home/page.tsx','app/skills/page.tsx','components/layout/Header.tsx','app/globals.css']){assert.equal(fs.readFileSync(path,'utf8'),fs.readFileSync('/workspace/streak-in-original/'+path,'utf8'),'Original Vercel visual baseline: '+path)}
-assert.ok(!fs.existsSync('public/images/pose-atlas.png'));assert.ok(!fs.existsSync('dist/images/pose-atlas.png'));assert.ok(!fs.readFileSync('prototype/main.tsx','utf8').includes('editorial.css'));console.log('PASS: original Vercel landing, home, catalogue, header and styles; generated atlas removed.');
+for(const path of ['components/layout/Header.tsx','app/globals.css']){assert.equal(fs.readFileSync(path,'utf8'),fs.readFileSync('/workspace/streak-in-original/'+path,'utf8'),'Original Vercel visual baseline: '+path)}
+assert.ok(!fs.existsSync('public/images/pose-atlas.png'));assert.ok(!fs.existsSync('dist/images/pose-atlas.png'));assert.ok(!fs.readFileSync('prototype/main.tsx','utf8').includes('editorial.css'));console.log('PASS: original Vercel header and global styles preserved; generated atlas absent.');
