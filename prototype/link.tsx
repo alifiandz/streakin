@@ -1,0 +1,1 @@
+import React from 'react';import {Link} from 'react-router-dom';export default function NextLink({href,children,prefetch,replace,...props}:any){return <Link to={href} replace={replace} {...props}>{children}</Link>}

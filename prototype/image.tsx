@@ -1,0 +1,1 @@
+import React from 'react';export default function Image({fill,priority,unoptimized,quality,sizes,style,...props}:any){return <img {...props} style={{...style,...(fill?{position:'absolute',width:'100%',height:'100%',inset:0}: {})}}/>}

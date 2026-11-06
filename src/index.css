@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #15171A;
+  --card: #23272D;
+  --line: #2E3238;
+  --text: #EEF1F4;
+  --text-sub: #8A929C;
+  --brand: #FF7A03;
+  --brand-text: #15171A;
+  --accent: #FF7A03;
+  --accent-bg: rgba(255, 122, 61, 0.1);
+}
+
+.light {
+  --bg: #F4F6F1;
+  --card: #FFFFFF;
+  --line: #E1E4DC;
+  --text: #15171A;
+  --text-sub: #5C636B;
+  --brand: #FF7A03;
+  --brand-text: #15171A;
+  --accent: #FF7A03;
+  --accent-bg: rgba(255, 122, 61, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for horizontal lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glass & elevated styling */
+.card-surface {
+  background-color: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.btn-brand {
+  background-color: var(--brand);
+  color: var(--brand-text);
+  font-weight: 700;
+  border-radius: 12px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-brand:hover {
+  background-color: #E66E00;
+  transform: translateY(-1px);
+}
+
+.btn-brand:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-weight: 600;
+  border-radius: 12px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #8A929C;
+}
