@@ -23,7 +23,7 @@ import { MobileContainer } from '@/components/layout/MobileContainer';
 import { SafeImage } from '@/components/ui/SafeImage';
 import { StageImage } from '@/components/ui/StageImage';
 import { SEED_SKILLS } from '@/lib/seedData';
-import { safeLocalStorage, STORAGE_KEYS } from '@/src/utils/storage';
+import { safeLocalStorage, STORAGE_KEYS, getLocalDateString } from '@/src/utils/storage';
 
 export default function WorkoutPlayerPage() {
   const params = useParams();
@@ -42,6 +42,8 @@ export default function WorkoutPlayerPage() {
 
   // Session start time
   const [startTime, setStartTime] = useState<string>('');
+  const [actualValues,setActualValues]=useState<Record<string,number>>({});
+  const lastFeedback=useRef<{value:number,time:number}|null>(null);
 
   useEffect(() => {
     if (activeWorkout && activeWorkout.sessionId === sessionId) {
@@ -141,6 +143,8 @@ export default function WorkoutPlayerPage() {
 
   // Feedback on countdown ticks
   const playCountdownFeedback = useCallback((secondsLeft: number) => {
+    if(lastFeedback.current?.value===secondsLeft && Date.now()-lastFeedback.current.time<800)return;
+    lastFeedback.current={value:secondsLeft,time:Date.now()};
     if (secondsLeft === 3 || secondsLeft === 2 || secondsLeft === 1) {
       playBeep(800, 100, 'sine');
       triggerHaptic(40);
@@ -295,7 +299,8 @@ export default function WorkoutPlayerPage() {
 
   // Handle set completion
   const handleCompleteSet = (setNumber: number, value: number) => {
-    const holdRecorded = holdTimerElapsed > 0 ? holdTimerElapsed : (value || targetDefaultVal);
+    const holdRecorded = isIsometricHold && holdTimerElapsed > 0 ? holdTimerElapsed : value;
+    if (!Number.isFinite(holdRecorded) || holdRecorded <= 0 || holdRecorded > 3600) { window.alert('Masukkan repetisi atau detik yang benar (1–3600).'); return; }
 
     const newCompleted: CompletedSet = {
       exerciseId: currentExerciseData.id,
@@ -362,6 +367,7 @@ export default function WorkoutPlayerPage() {
   // Navigate to next exercise or finish session
   const handleNextOrFinish = async () => {
     if (isFinishing) return;
+    if (setsDoneForThisExercise < currentSessionExercise.sets) { window.alert('Selesaikan semua set gerakan ini sebelum melanjutkan.'); return; }
     setTimerRunning(false);
     restTimerEndMsRef.current = null;
     setHoldTimerRunning(false);
@@ -393,7 +399,7 @@ export default function WorkoutPlayerPage() {
           sessionId: session.id,
           sessionNama: session.nama,
           skillFocus: session.skillId || null,
-          tanggal: new Date().toISOString().split('T')[0],
+          tanggal: getLocalDateString(),
           durasiDetik: durationSeconds,
           setsCompleted: completedSets,
         });
@@ -401,6 +407,7 @@ export default function WorkoutPlayerPage() {
         router.push(`/selesai/${logId}`);
       } catch (err) {
         console.error('Failed to save workout log', err);
+        window.alert(err instanceof Error ? err.message : 'Latihan belum tersimpan. Coba lagi.');
         setIsFinishing(false);
       }
     }
@@ -555,7 +562,7 @@ export default function WorkoutPlayerPage() {
 
               <p className="text-xs text-[#8A929C] mt-1 sm:mt-1.5">
                 {holdTimerRunning
-                  ? 'Pertahankan kontraksi otot, kunci siku & postur!'
+                  ? 'Pertahankan posisi terkontrol dan bernapas teratur.'
                   : holdTimerElapsed > 0
                     ? `Hold tercapai: ${holdTimerElapsed} detik`
                     : 'Ketuk tombol di bawah untuk mulai menahan posisi'}
@@ -591,6 +598,7 @@ export default function WorkoutPlayerPage() {
                 type="button"
                 onClick={() => {
                   setHoldTimerRunning(false);
+                  holdTimerBaseSecRef.current=0;holdTimerStartMsRef.current=null;
                   setHoldTimerElapsed(0);
                 }}
                 className="min-h-[48px] py-3 px-4 rounded-xl bg-[#15171A] border border-[#2E3238] text-[#8A929C] hover:text-[#EEF1F4] text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-colors select-none"
@@ -637,6 +645,10 @@ export default function WorkoutPlayerPage() {
                       <span className="text-xs font-semibold text-[#EEF1F4] block">
                         Target: {currentSessionExercise.target} {currentSessionExercise.unit}
                       </span>
+                      <label className="text-[10px] text-[#8A929C] block mt-1">
+                        Hasil aktual ({currentSessionExercise.unit})
+                        <input aria-label={`Hasil set ${setNo}`} type="number" min="1" max="3600" step="1" value={actualValues[currentExerciseData.id+':'+setNo] ?? completedItem?.nilai ?? currentSessionExercise.target} onChange={e=>setActualValues(prev=>({...prev,[currentExerciseData.id+':'+setNo]:Number(e.target.value)}))} className="block w-20 bg-[#23272D] border border-[#2E3238] rounded px-2 py-2 text-xs text-[#EEF1F4] mt-1" />
+                      </label>
                       {completedItem && (
                         <p className="text-[11px] text-[#FF7A03]">
                           Tercatat: {completedItem.nilai} {currentSessionExercise.unit}
@@ -651,7 +663,7 @@ export default function WorkoutPlayerPage() {
                     onClick={() =>
                       handleCompleteSet(
                         setNo,
-                        holdTimerElapsed > 0 ? holdTimerElapsed : currentSessionExercise.target
+                        isIsometricHold && holdTimerElapsed > 0 ? holdTimerElapsed : (actualValues[currentExerciseData.id+':'+setNo] ?? completedItem?.nilai ?? currentSessionExercise.target)
                       )
                     }
                     className={`min-h-[44px] min-w-[100px] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all select-none active:scale-95 ${isSetDone

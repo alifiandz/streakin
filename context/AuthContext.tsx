@@ -24,16 +24,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load theme and stored user on mount (client-only to prevent hydration mismatch)
   useEffect(() => {
     initStorageData();
-    const stored = safeLocalStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.id) {
-          setCurrentUser(parsed);
-        }
-      } catch {}
-    }
-
     /*
      * [MODE TERANG DINONAKTIFKAN SEMENTARA - SEGERA HADIR]
      * Simpan kode asli untuk re-aktivasi nanti:
@@ -70,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setCurrentUser(userObj);
             safeLocalStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(userObj));
           }
-        }
+        } else {setCurrentUser(null);safeLocalStorage.removeItem(STORAGE_KEYS.CURRENT_USER);}
       } catch (err) {
         console.error('Gagal mengecek sesi login ke MySQL:', err);
       } finally {

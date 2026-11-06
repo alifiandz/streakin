@@ -10,7 +10,7 @@ import { MobileContainer } from '@/components/layout/MobileContainer';
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { library, saveLibrary } = useWorkout();
+  const { library, saveLibrary, getSkillProgress } = useWorkout();
 
   // Durasi options (default kosong untuk user baru sebelum memilih)
   const [selectedDurations, setSelectedDurations] = useState<number[]>(
@@ -55,6 +55,7 @@ export default function LibraryPage() {
 
   // Filter sessions: jika salah satu filter aktif, cocokkan dengan filter yang dipilih
   const filteredSessions = SEED_SESSIONS.filter((session) => {
+    if (session.skillId && session.stageNumber && session.stageNumber > getSkillProgress(session.skillId).currentStage) return false;
     // Jika tidak ada durasi yang dipilih, abaikan filter durasi (lolos)
     const matchDur =
       selectedDurations.length === 0 ||
@@ -75,8 +76,7 @@ export default function LibraryPage() {
 
   const handleSave = async () => {
     if (selectedSessionIds.length === 0) return;
-    await saveLibrary(selectedDurations, selectedFocuses, selectedSessionIds);
-    router.push('/home');
+    try { await saveLibrary(selectedDurations, selectedFocuses, selectedSessionIds); router.push('/home'); } catch(e) { window.alert(e instanceof Error ? e.message : 'Library gagal disimpan.'); }
   };
 
   return (
@@ -103,7 +103,7 @@ export default function LibraryPage() {
               <span className="text-[11px] text-[#8A929C]">Multi-pilih</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {[10, 15, 30].map((dur) => {
+              {[10, 15, 20, 30].map((dur) => {
                 const active = selectedDurations.includes(dur);
                 return (
                   <button

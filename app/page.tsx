@@ -62,7 +62,7 @@ export default function LandingPage() {
 
           {/* Subheadline Kasual & Suportif */}
           <p className="text-xs sm:text-base text-[var(--text-sub)] leading-relaxed mb-6 max-w-xl mx-auto">
-            Tanpa alat gym, tanpa alur ribet. Cukup 10–30 menit sepulang sekolah atau di sela tugas, bangun postur tegap dan jaga konsistensi streak bareng kawan latihanmu.
+            Tanpa keanggotaan gym, tanpa alur ribet. Cukup 10–30 menit sepulang sekolah atau di sela tugas, bangun postur tegap dan jaga konsistensi streak bareng kawan latihanmu.
           </p>
 
           {/* Satu Ajakan Utama (Primary CTA) */}
@@ -79,7 +79,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-[var(--text-sub)] mt-1">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#FF7A03]" />
-                Gratis • Tanpa alat • Ada akun demo
+                Gratis • Latihan terarah • Ada akun demo
               </span>
               <span className="hidden sm:inline text-[var(--line)]">•</span>
               <Link

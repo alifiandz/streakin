@@ -1,18 +1,34 @@
-// Prototype adapter only. No credentials or requests are sent to the original app.
-const nativeFetch=window.fetch.bind(window);const KEY='streakin_friend_prototype_data_v1';
-type DB={user:any;library:any;skills:any[];logs:any[]};
-function read():DB{try{return JSON.parse(localStorage.getItem(KEY)||'null')||{user:null,library:null,skills:[],logs:[]}}catch{return {user:null,library:null,skills:[],logs:[]}}}
+import { SEED_SESSIONS, SEED_SKILLS } from '../lib/seedData';
+import { getLocalDateString } from '../src/utils/storage';
+const nativeFetch=window.fetch.bind(window);export const KEY='streakin_training_v2';
+type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[]};
+type DB={version:2;active:string|null;profiles:Profile[]};
+function read():DB{const raw=localStorage.getItem(KEY);if(!raw)return {version:2,active:null,profiles:[]};const d=JSON.parse(raw);if(d.version!==2||!Array.isArray(d.profiles))throw Error('Data lokal tidak valid. Pulihkan dari cadangan.');return d}
 function save(d:DB){localStorage.setItem(KEY,JSON.stringify(d))}
-function reply(data:any,status=200){return Promise.resolve(new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}}))}
-window.fetch=((input:RequestInfo|URL,options?:RequestInit)=>{let url=typeof input==='string'?input:input instanceof URL?input.pathname:input.url;if(!url.startsWith('/api/'))return nativeFetch(input,options);const db=read();let b:any={};try{b=JSON.parse(String(options?.body||'{}'))}catch{}const post=options?.method==='POST';
-if(url==='/api/auth/me')return db.user?reply({success:true,user:db.user}):reply({success:false},401);
-if(url==='/api/auth/logout'){db.user=null;save(db);return reply({success:true})}
-if(url==='/api/auth/login'||url==='/api/auth/register'){
- if(url.endsWith('login')&&(b.email!=='rizky@sma11.sch.id'||b.kataSandi!=='rahasia123'))return reply({success:false,error:'Gunakan akun demo: rizky@sma11.sch.id / rahasia123. Pendaftaran pada prototipe hanya membuat profil lokal.'},401);
- db.user={id:'usr_demo_1',nama:url.endsWith('register')?(b.nama||'Rizky'):'Rizky',email:b.email||'rizky@sma11.sch.id'};save(db);return reply({success:true,user:db.user})}
-if(!db.user)return reply({success:false,error:'Belum terautentikasi'},401);
-if(url==='/api/library'){if(post){db.library={userId:db.user.id,durasi:b.durasi||[10,15],fokus:b.fokus||[],sessionIds:b.sessionIds||[],skills:b.skills||[]};save(db)}return reply({success:true,data:db.library})}
-if(url==='/api/skills/progress'){if(post){const old=db.skills.find(x=>x.skillId===b.skillId);if(old){old.currentStage=b.currentStage??old.currentStage;old.bestHoldSec=Math.max(old.bestHoldSec||0,b.bestHoldSec||0)}else db.skills.push({userId:db.user.id,skillId:b.skillId,currentStage:b.currentStage||1,bestHoldSec:b.bestHoldSec||0});save(db)}return reply({success:true,data:db.skills})}
-if(url==='/api/workout-logs'){if(post){const log={...b,id:crypto.randomUUID(),userId:db.user.id,completedAt:new Date().toISOString()};db.logs.unshift(log);save(db);return reply({success:true,data:log})}return reply({success:true,data:db.logs})}
-return reply({success:false,error:'Endpoint tidak tersedia pada prototipe'},404);
-}) as typeof fetch;
+function reply(data:any,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}})}
+const pub=(p:Profile)=>({id:p.id,nama:p.nama,email:p.email});
+const hex=(b:ArrayBuffer)=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
+async function password(value:string,salt:string){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(value),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:210000,hash:'SHA-256'},key,256))}
+function ensure(v:any,msg:string){if(!v)throw Error(msg)}
+window.fetch=(async(input:RequestInfo|URL,options?:RequestInit)=>{const url=typeof input==='string'?input:input instanceof URL?input.pathname:input.url;if(!url.startsWith('/api/'))return nativeFetch(input,options);try{const db=read();const b=JSON.parse(String(options?.body||'{}'));const post=options?.method==='POST';let user=db.profiles.find(p=>p.id===db.active);
+if(url==='/api/auth/me')return user?reply({success:true,user:pub(user)}):reply({success:false},401);
+if(url==='/api/auth/logout'){db.active=null;save(db);return reply({success:true})}
+if(url==='/api/auth/register'||url==='/api/auth/login'){
+ const email=String(b.email||'').trim().toLowerCase(),pass=String(b.kataSandi||'');ensure(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),'Format email tidak valid.');
+ let p=db.profiles.find(x=>x.email===email);
+ if(url.endsWith('register')){ensure(String(b.nama||'').trim().length>0,'Nama wajib diisi.');ensure(pass.length>=8,'Kata sandi minimal 8 karakter.');ensure(!p,'Email sudah terdaftar di perangkat ini.');const salt=crypto.randomUUID();p={id:crypto.randomUUID(),nama:String(b.nama).trim().slice(0,80),email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}else{
+ if(!p&&email==='rizky@sma11.sch.id'&&pass==='rahasia123'){const salt=crypto.randomUUID();p={id:'usr_demo_1',nama:'Rizky',email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}
+ ensure(p&&await password(pass,p.salt)===p.verifier,'Email atau kata sandi salah. Akun perangkat lain memerlukan pemulihan cadangan.');}
+ const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
+if(!user)return reply({success:false,error:'Masuk terlebih dahulu.'},401);
+if(url==='/api/backup'){
+ if(post){ensure(b.format==='streakin-backup-v1'&&Array.isArray(b.logs)&&Array.isArray(b.skills),'Format cadangan tidak valid.');ensure(b.logs.length<=10000,'Cadangan terlalu besar.');ensure(b.logs.every((l:any)=>l.id&&l.sessionId&&Array.isArray(l.sets)&&l.sets.every((s:any)=>Number.isFinite(s.valueLogged)&&s.valueLogged>0)),'Riwayat cadangan tidak valid.');ensure(b.skills.every((s:any)=>SEED_SKILLS.some(k=>k.id===s.skillId)&&Number.isInteger(s.currentStage)&&s.currentStage>=1&&s.currentStage<=5),'Progres cadangan tidak valid.');ensure(!b.library||(Array.isArray(b.library.sessionIds)&&b.library.sessionIds.every((id:string)=>SEED_SESSIONS.some(s=>s.id===id))),'Library cadangan tidak valid.');user.logs=b.logs.map((l:any)=>({...l,userId:user!.id}));user.skills=b.skills.map((s:any)=>({...s,userId:user!.id}));user.library=b.library?{...b.library,userId:user.id}:null;save(db);return reply({success:true})}
+ return reply({success:true,data:{format:'streakin-backup-v1',exportedAt:new Date().toISOString(),library:user.library,skills:user.skills,logs:user.logs}})}
+if(url==='/api/library'){if(post){ensure(Array.isArray(b.sessionIds)&&b.sessionIds.length>0,'Pilih minimal satu sesi.');ensure(b.sessionIds.every((id:string)=>SEED_SESSIONS.some(s=>s.id===id)),'Sesi tidak dikenal.');user.library={userId:user.id,durasi:b.durasi||[],fokus:b.fokus||[],sessionIds:[...new Set(b.sessionIds)]};save(db)}return reply({success:true,data:user.library})}
+if(url==='/api/skills/progress'){if(post){ensure(SEED_SKILLS.some(s=>s.id===b.skillId),'Skill tidak dikenal.');const old=user.skills.find(x=>x.skillId===b.skillId);const n=b.currentStage??old?.currentStage??1;ensure(Number.isInteger(n)&&n>=1&&n<=5&&n<=(old?.currentStage??1)+1,'Naik satu tahap setelah memenuhi kriteria.');const next={userId:user.id,skillId:b.skillId,currentStage:n,bestHoldSec:old?.bestHoldSec||0};if(old)Object.assign(old,next);else user.skills.push(next);save(db)}return reply({success:true,data:user.skills})}
+if(url==='/api/workout-logs'){if(post){const session=SEED_SESSIONS.find(s=>s.id===b.sessionId);ensure(session,'Sesi tidak dikenal.');ensure(Array.isArray(b.sets)&&b.sets.length>0,'Catat minimal satu set.');ensure(Number.isFinite(b.durasiDetik)&&b.durasiDetik>0,'Durasi tidak valid.');for(const set of b.sets){const target=session!.exercises.find(e=>e.exerciseId===set.exerciseId);ensure(target&&Number.isInteger(set.noSet)&&set.noSet>=1&&set.noSet<=target.sets,'Set tidak valid.');ensure(Number.isFinite(set.valueLogged)&&set.valueLogged>0&&set.valueLogged<=3600,'Nilai set harus 1–3600.');set.isIsometric=target!.unit==='detik';}
+ ensure(!session!.stageNumber || session!.stageNumber<=(user.skills.find(s=>s.skillId===session!.skillId)?.currentStage||1),'Tahap belum terbuka.');ensure(b.sets.length===session!.exercises.reduce((n,e)=>n+e.sets,0),'Selesaikan semua set sesi ini.');ensure(typeof b.completionKey==='string'&&b.completionKey.length>0,'Identitas penyelesaian wajib.');const unique=new Set(b.sets.map((s:any)=>s.exerciseId+':'+s.noSet));ensure(unique.size===b.sets.length,'Set duplikat.');const existing=user.logs.find(l=>b.completionKey&&l.completionKey===b.completionKey);if(existing)return reply({success:true,data:existing});
+ const log={...b,skillFocus:session!.skillId||null,id:crypto.randomUUID(),userId:user.id,localDate:getLocalDateString(),completedAt:new Date().toISOString(),streakCount:0};user.logs.unshift(log);
+ const skillExercises:Record<string,string[]>={'l-sit':['ex1','ex2','ex11','ex12','ex13'],'handstand':['ex3','ex4','ex14','ex15','ex16'],'elbow-lever':['ex17','ex18','ex19','ex20','ex21']};const primary=session!.exercises.find(e=>skillExercises[session!.skillId||'']?.includes(e.exerciseId));if(session!.skillId&&primary?.unit==='detik'){const best=Math.max(0,...b.sets.filter((s:any)=>s.exerciseId===primary.exerciseId).map((s:any)=>s.valueLogged));let progress=user.skills.find(s=>s.skillId===session!.skillId);if(!progress){progress={userId:user.id,skillId:session!.skillId,currentStage:1,bestHoldSec:0};user.skills.push(progress)}progress.bestHoldSec=Math.max(progress.bestHoldSec,best)}save(db);return reply({success:true,data:log})}return reply({success:true,data:user.logs})}
+return reply({success:false,error:'Endpoint tidak tersedia.'},404)
+}catch(e){return reply({success:false,error:e instanceof Error?e.message:'Penyimpanan gagal.'},400)}}) as typeof fetch;

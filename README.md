@@ -1,9 +1,15 @@
-# StreakIn — faithful Sites prototype
+# StreakIn training app — Sites edition
 
-Copied from https://github.com/Fr0uu/streak-in at the commit recorded in ORIGINAL_SOURCE.txt.
-Current Next.js page JSX, components, styling, images and content are retained.
-Sites prototype runs those client screens through Vite and React Router, with thin Next navigation/image adapters.
-API requests are intercepted locally; no original backend is used. Login uses the published demo account. Registration creates a local prototype profile only; no password is saved.
-Progress and preferences persist only in this browser. Production authentication/database integration remains for Jagoan Hosting + Webuzo, streakin.my.id.
+Preserves the friend's current interface and original source reference in ORIGINAL_SOURCE.txt.
 
-Run npm install, then npm run build. Static output: dist/.
+Implemented training functions: device-local profiles with PBKDF2 password verifiers, persisted library, gated skill progression, actual reps/hold entry, validated complete sessions, timestamp-based timers, resumable set records, idempotent completion, local calendar-date streaks, separate rep totals, history, backup/restore, open-app reminders and calendar (.ics) export. Added a basic Legs template. Incorrect pose mappings have been removed or corrected; missing approved illustrations show neutral fallback labels.
+
+## Verification
+npm run build
+npx tsc --noEmit
+node tests/training.mjs
+
+## Limits
+Data and profile login are device-local, not server authentication. Local profile isolation is an app convenience, not a security boundary against someone with device/browser access. No email recovery, automatic cloud sync, background push delivery, or deployed Jagoan backend. Browser preview QA is blocked by unavailable relay/desktop automation. Some movements still need approved illustrations. This release is not claimed to be flawless or production-complete.
+
+Production target: Jagoan Hosting + Webuzo, streakin.my.id. A real database/auth deployment and device browser verification remain required for production release.

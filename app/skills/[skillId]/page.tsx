@@ -65,7 +65,8 @@ export default function SkillDetailPage() {
     skill.stages.find((s) => s.stageNumber === selectedStageTab) || skill.stages[0];
 
   const handleAdvanceStage = async (newStage: number) => {
-    await updateSkillStage(skill.id, newStage);
+    if (newStage > currentStageNum && !window.confirm('Saya sudah memenuhi seluruh kriteria kelulusan tahap ini dengan teknik yang nyaman dan terkontrol. Lanjutkan?')) return;
+    try { await updateSkillStage(skill.id, newStage); } catch (e) { setToastMessage(e instanceof Error ? e.message : 'Gagal menyimpan progres.'); return; }
     setSelectedStageTab(newStage);
     setToastMessage(`Selamat! Stage aktifmu kini naik ke Stage ${newStage}: ${skill.stages[newStage - 1]?.nama || ''}`);
     setTimeout(() => setToastMessage(null), 4000);
@@ -402,7 +403,7 @@ export default function SkillDetailPage() {
           {/* Bottom Actions - Area sentuh min 48px */}
           <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-3 sm:pt-3.5 border-t border-[#2E3238]">
             <Link
-              href={`/latihan/s_${skill.id.replace('-', '')}_${selectedStageData.stageNumber}`}
+              href={selectedStageData.stageNumber <= currentStageNum ? `/latihan/s_${skill.id.replace('-', '')}_${selectedStageData.stageNumber}` : `/skills/${skill.id}`}
               className="w-full sm:flex-1 btn-brand min-h-[48px] py-3 text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#FF7A03]/20 active:scale-98 transition-all"
             >
               <Play className="w-4 h-4 fill-current" />

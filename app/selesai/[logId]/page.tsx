@@ -66,7 +66,7 @@ export default function WorkoutDonePage() {
 
   const totalSets = currentLog ? currentLog.setsCompleted.length : 0;
   const totalReps = currentLog
-    ? currentLog.setsCompleted.reduce((sum, s) => sum + (s.nilai || 0), 0)
+    ? currentLog.setsCompleted.filter(s => !s.isIsometric).reduce((sum, s) => sum + (s.nilai || 0), 0)
     : 0;
   const durationMinutes = currentLog
     ? Math.max(1, Math.round(currentLog.durasiDetik / 60))
@@ -158,11 +158,11 @@ export default function WorkoutDonePage() {
             <div className="text-lg sm:text-2xl font-extrabold text-[#EEF1F4]">
               {totalReps}
             </div>
-            <span className="text-[10px] text-[#FF7A03] font-semibold">Kontraksi Efektif</span>
+            <span className="text-[10px] text-[#FF7A03] font-semibold">Repetisi dinamis; hold dihitung terpisah</span>
           </div>
         </div>
 
-        {/* Isometric Personal Best Highlight (If applicable) */}
+        {/* Isometric Session Best Highlight (If applicable) */}
         {maxHoldInLog > 0 && (
           <div className="card-surface p-3.5 sm:p-4 mb-3.5 border-[#FF7A03]/40 bg-gradient-to-r from-[#23272D] to-[#1E2227] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
@@ -171,7 +171,7 @@ export default function WorkoutDonePage() {
               </div>
               <div>
                 <span className="text-xs font-bold text-[#FF7A03] uppercase tracking-wider block">
-                  Rekor Tahanan (Isometric Hold)
+                  Hold Terlama Sesi Ini
                 </span>
                 <p className="text-[11px] text-[#8A929C]">Hold terlama pada sesi latihan ini</p>
               </div>

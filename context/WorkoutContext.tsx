@@ -70,7 +70,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const skillRes = await fetch('/api/skills/progress');
       if (skillRes.ok) {
         const skillData = await skillRes.json();
-        if (skillData.success && Array.isArray(skillData.data) && skillData.data.length > 0) {
+        if (skillData.success && Array.isArray(skillData.data) && skillData.data.length >= 0) {
           setSkillProgressList(skillData.data);
         }
       }
@@ -86,7 +86,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
             sessionId: item.sessionId,
             sessionNama: item.sessionName || item.sessionNama || 'Sesi Latihan',
             skillFocus: item.skillFocus || null,
-            tanggal: item.completedAt ? item.completedAt.slice(0, 10) : getLocalDateString(),
+            tanggal: item.localDate || (item.completedAt ? getLocalDateString(new Date(item.completedAt)) : getLocalDateString()),
             durasiDetik: item.durasiDetik || 0,
             streakCount: item.streakCount ?? 1,
             setsCompleted: (item.sets || []).map((s: any) => ({
@@ -118,6 +118,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLibrary(null);
       setLogs([]);
       setActiveWorkout(null);
+      setSkillProgressList([]);
       return;
     }
 
@@ -167,54 +168,11 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateSkillStage = async (skillId: string, stage: number) => {
-    setSkillProgressList((prev) => {
-      const exists = prev.some((p) => p.skillId === skillId);
-      if (exists) {
-        return prev.map((p) => (p.skillId === skillId ? { ...p, currentStage: stage } : p));
-      }
-      return [
-        ...prev,
-        { userId: currentUser?.id || '', skillId, currentStage: stage, bestHoldSec: 0 },
-      ];
-    });
-
-    try {
-      await fetch('/api/skills/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skillId, currentStage: stage }),
-      });
-    } catch (err) {
-      console.error('Gagal memperbarui skill stage:', err);
-    }
+    const res = await fetch('/api/skills/progress', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({skillId,currentStage:stage})});
+    const result=await res.json();if(!res.ok)throw new Error(result.error || 'Progres gagal disimpan');
+    await loadUserData(currentUser!.id);
   };
-
-  const updateBestHold = async (skillId: string, holdSec: number) => {
-    setSkillProgressList((prev) => {
-      const exists = prev.some((p) => p.skillId === skillId);
-      if (exists) {
-        return prev.map((p) =>
-          p.skillId === skillId
-            ? { ...p, bestHoldSec: Math.max(holdSec, p.bestHoldSec) }
-            : p
-        );
-      }
-      return [
-        ...prev,
-        { userId: currentUser?.id || '', skillId, currentStage: 1, bestHoldSec: holdSec },
-      ];
-    });
-
-    try {
-      await fetch('/api/skills/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skillId, bestHoldSec: holdSec }),
-      });
-    } catch (err) {
-      console.error('Gagal memperbarui best hold:', err);
-    }
-  };
+  const updateBestHold = async (_skillId: string, _holdSec: number) => {};
 
   // Auto-rotating session calculation
   const getTodaySession = (): WorkoutSession => {
@@ -244,7 +202,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const todaySession = getTodaySession();
 
   const getSessionById = (id: string): WorkoutSession | undefined => {
-    return SEED_SESSIONS.find((s) => s.id === id);
+    const session=SEED_SESSIONS.find((s) => s.id === id);
+    if(session?.skillId && session.stageNumber && session.stageNumber > getSkillProgress(session.skillId).currentStage) return undefined;
+    return session;
   };
 
   const saveLibrary = async (durasi: number[], fokus: string[], sessionIds: string[]) => {
@@ -255,17 +215,9 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       fokus,
       sessionIds,
     };
+    const res = await fetch('/api/library', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({durasi,fokus,sessionIds})});
+    const result=await res.json();if(!res.ok)throw new Error(result.error || 'Library gagal disimpan');
     setLibrary(newLib);
-
-    try {
-      await fetch('/api/library', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ durasi, fokus, sessionIds }),
-      });
-    } catch (err) {
-      console.error('Gagal menyimpan library:', err);
-    }
   };
 
   const saveActiveWorkout = (active: ActiveWorkout | null) => {
@@ -283,65 +235,11 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addWorkoutLog = async (logData: Omit<WorkoutLog, 'id' | 'userId'>): Promise<string> => {
-    if (!currentUser) return '';
-    const tempId = `log_${Date.now()}`;
-    const newStreak = streak + 1;
-
-    const newLog: WorkoutLog = {
-      ...logData,
-      id: tempId,
-      userId: currentUser.id,
-      streakCount: newStreak,
-      tanggal: logData.tanggal || getLocalDateString(),
-    };
-
-    setLogs((prev) => [newLog, ...prev]);
-    clearActiveWorkout();
-
-    // Cek hold detik maksimal dari sets yang isIsometric
-    let maxIsometricHold = 0;
-    logData.setsCompleted.forEach((s) => {
-      if (s.isIsometric && s.nilai > maxIsometricHold) {
-        maxIsometricHold = s.nilai;
-      }
-    });
-
-    if (logData.skillFocus && maxIsometricHold > 0) {
-      updateBestHold(logData.skillFocus, maxIsometricHold);
-    }
-
-    try {
-      const res = await fetch('/api/workout-logs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: logData.sessionId,
-          sessionName: logData.sessionNama,
-          skillFocus: logData.skillFocus || null,
-          durasiDetik: logData.durasiDetik,
-          streakCount: newStreak,
-          sets: logData.setsCompleted.map((s) => ({
-            exerciseId: s.exerciseId,
-            exerciseName: s.exerciseName || 'Gerakan',
-            noSet: s.noSet,
-            valueLogged: s.nilai,
-            isIsometric: Boolean(s.isIsometric),
-          })),
-        }),
-      });
-
-      if (res.ok) {
-        const result = await res.json();
-        if (result.success && result.data?.id) {
-          setLogs((prev) => prev.map((item) => item.id === tempId ? { ...item, id: result.data.id } : item));
-          return result.data.id;
-        }
-      }
-    } catch (err) {
-      console.error('Gagal mencatat log ke Supabase:', err);
-    }
-
-    return tempId;
+    if (!currentUser) throw new Error('Masuk terlebih dahulu.');
+    const completionKey=activeWorkout?.mulai || logData.sessionId+':'+logData.tanggal;
+    const res=await fetch('/api/workout-logs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:logData.sessionId,sessionName:logData.sessionNama,skillFocus:logData.skillFocus,durasiDetik:logData.durasiDetik,completionKey,sets:logData.setsCompleted.map(s=>({exerciseId:s.exerciseId,exerciseName:s.exerciseName,noSet:s.noSet,valueLogged:s.nilai,isIsometric:Boolean(s.isIsometric)}))})});
+    const result=await res.json();if(!res.ok||!result.data?.id)throw new Error(result.error||'Latihan belum tersimpan. Coba lagi.');
+    await loadUserData(currentUser.id);clearActiveWorkout();return result.data.id;
   };
 
   const updateReminder = (aktif: boolean, jam: string) => {

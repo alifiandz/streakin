@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +22,26 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "next/link": [
+        "./prototype/link.tsx"
+      ],
+      "next/navigation": [
+        "./prototype/navigation.ts"
+      ],
+      "next/image": [
+        "./prototype/image.tsx"
+      ]
+    },
+    "target": "ES2022"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src/legacy_pages", "src/App.tsx", "src/main.tsx"]
+  "include": [
+    "prototype/**/*.ts",
+    "prototype/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

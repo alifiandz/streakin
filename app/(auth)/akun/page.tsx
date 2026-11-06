@@ -279,7 +279,7 @@ function AuthContent() {
 
               {forgotPasswordMsg && (
                 <div className="p-3 rounded-xl bg-[#FF7A03]/10 border border-[#FF7A03]/30 text-xs text-[#FF7A03]">
-                  Tautan atur ulang kata sandi dikirim ke emailmu (simulasi demo).
+                  Versi perangkat ini tidak mengirim email pemulihan. Jika lupa kata sandi, buat profil baru dengan email berbeda lalu pulihkan cadangan latihan dari menu Pengingat.
                 </div>
               )}
 
@@ -329,6 +329,7 @@ function AuthContent() {
           </div>
         </div>
 
+        <p className="text-center text-[11px] text-[#8A929C] mt-4">Akun perangkat ini · Progres tersimpan di browser ini. Cadangkan dari menu pengingat.</p>
         {/* Back to Home Link */}
         <div className="text-center mt-5">
           <Link

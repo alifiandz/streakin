@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { TrainingTools } from '@/prototype/TrainingTools';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useWorkout } from '@/context/WorkoutContext';
@@ -44,7 +45,7 @@ export default function NotificationPage() {
         {savedBanner && (
           <div className="p-3.5 rounded-xl bg-[#FF7A03]/15 border border-[#FF7A03]/40 text-[#FF7A03] text-xs font-semibold flex items-center gap-2 mb-4 animate-in fade-in duration-200">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-            <span>Pengingat berhasil disimpan untuk pukul {jam} WIB.</span>
+            <span>Pengingat dalam aplikasi disimpan untuk pukul {jam} (waktu perangkat).</span>
           </div>
         )}
 
@@ -58,7 +59,7 @@ export default function NotificationPage() {
                   Pengingat Latihan Harian
                 </h3>
                 <p className="text-xs text-[#8A929C] mt-0.5">
-                  Kirim alarm pengingat setiap hari di jam belajar/istirahat.
+                  Tampilkan pengingat saat aplikasi terbuka. Gunakan kalender untuk alarm saat aplikasi ditutup.
                 </p>
               </div>
 
@@ -84,7 +85,7 @@ export default function NotificationPage() {
             {/* Time Picker */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-[#8A929C] mb-2">
-                Pilih Jam Pengingat (WIB):
+                Pilih Jam Pengingat (waktu perangkat):
               </label>
               <div className="relative max-w-xs">
                 <input
@@ -113,6 +114,7 @@ export default function NotificationPage() {
             </button>
           </form>
         </div>
+        <TrainingTools />
       </MobileContainer>
     </div>
   );

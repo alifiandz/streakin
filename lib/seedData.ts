@@ -1246,3 +1246,17 @@ export const SEED_SESSIONS: WorkoutSession[] = [
     ]
   }
 ];
+
+// Pose audit: never display a different movement as instruction.
+for (const skill of SEED_SKILLS) {
+ for (const stage of skill.stages) {
+  if (skill.id === 'elbow-lever' || (skill.id === 'l-sit' && stage.stageNumber === 4) || (skill.id === 'handstand' && [1,4].includes(stage.stageNumber))) stage.imageUrl = undefined;
+  if(skill.id==='handstand' && stage.stageNumber===2) stage.imageUrl='/images/skills/hs-skill-chest-to-wall.png';
+ }
+}
+for(const exercise of SEED_EXERCISES){
+ if(['ex3','ex12','ex15','ex17','ex18','ex19','ex20','ex21'].includes(exercise.id))exercise.imageUrl=undefined;
+ if(exercise.id==='ex4')exercise.imageUrl='/images/skills/hs-skill-chest-to-wall.png';
+}
+SEED_EXERCISES.push({id:'ex26',nama:'Bodyweight Squat',area:'Paha & bokong',targetDefault:'3 × 8 reps',langkah:['Berdiri dengan kaki selebar bahu di permukaan stabil.','Tekuk pinggul dan lutut perlahan dalam rentang yang nyaman.','Jaga tumit menapak dan lutut mengikuti arah jari kaki.','Dorong lantai untuk kembali berdiri tanpa menahan napas.'],kesalahanUmum:['Memaksakan kedalaman meskipun nyeri.','Tumit terangkat atau lutut jatuh ke dalam.'],lebihMudah:'Duduk-berdiri dari kursi kokoh',lebihSulit:'Turunkan tubuh lebih perlahan'});
+SEED_SESSIONS.push({id:'s_legs_10',nama:'Legs Foundations 10',durasiMenit:10,fokus:'Legs',exercises:[{exerciseId:'ex26',sets:3,target:8,unit:'reps',istirahatDetik:60},{exerciseId:'ex9',sets:2,target:8,unit:'reps',istirahatDetik:45},{exerciseId:'ex10',sets:2,target:20,unit:'detik',istirahatDetik:45,isIsometric:true}]});
