@@ -8,9 +8,22 @@
 <p align="center"><a href="https://streakin.my.id"><strong>Try StreakIn live →</strong></a> · <a href="#what-you-can-do">Explore the features</a> · <a href="#run-it-locally">Run it locally</a></p>
 <p align="center"><a href="https://github.com/alifiandz/streakin/actions/workflows/verify.yml"><img src="https://github.com/alifiandz/streakin/actions/workflows/verify.yml/badge.svg" alt="StreakIn build and tests" /></a></p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18.3.1-149ECA?style=for-the-badge&logo=react&logoColor=white" alt="React 18.3.1" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.9.3" />
+  <img src="https://img.shields.io/badge/Vite-5.4.21-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 5.4.21" />
+  <img src="https://img.shields.io/badge/Tailwind%20CSS-3.4.19-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 3.4.19" />
+  <img src="https://img.shields.io/badge/React%20Router-6.30.6-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router 6.30.6" />
+  <img src="https://img.shields.io/badge/Supabase%20JS-2.119.0-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase JS 2.119.0" />
+  <img src="https://img.shields.io/badge/Lucide-0.446.0-F56565?style=for-the-badge&logo=lucide&logoColor=white" alt="Lucide 0.446.0" />
+  <img src="https://img.shields.io/badge/Node.js-24-5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 24" />
+  <img src="https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions CI" />
+  <img src="https://img.shields.io/badge/Hosting-Webuzo%20%2F%20VPS-FF7A03?style=for-the-badge" alt="Hosting Webuzo / VPS" />
+</p>
+
 ## Stop wondering where to start. Start moving.
 
-School, assignments, and a packed day can make training feel like something for later. StreakIn turns a big goal—your first L-Sit, Handstand, or Elbow Lever—into a session you can follow today.
+School, assignments, and a packed day can make training feel like something for later. StreakIn turns a big goal, such as your first L-Sit, Handstand, or Elbow Lever, into a session you can follow today.
 
 Pick **5, 10, 15, or 30 minutes**, see the equipment you need, and follow the warm-up, exercises, timers, and rest periods. Come back to a record of what you actually completed.
 
@@ -70,7 +83,20 @@ The build is generated in `dist/`. Production Google sign-in settings are domain
 
 ## Under the hood
 
-**React · TypeScript · Vite · Tailwind CSS · React Router**
+| Technology | Role in StreakIn |
+| --- | --- |
+| React + TypeScript | Typed components, application state, and interactive training screens. |
+| Vite | Local development and production static builds. |
+| Tailwind CSS + PostCSS + Autoprefixer | Utility styling, CSS processing, and browser compatibility. |
+| React Router | Client-side navigation and deep links. |
+| Supabase JavaScript SDK | Google account authentication on the production domain. |
+| Lucide React | Interface icons. |
+| clsx + tailwind-merge | Conditional classes and Tailwind class composition. |
+| Browser localStorage | Device-local profiles, workout history, preferences, and session checkpoints. |
+| Node.js + SQLite | Independently tested server entitlement implementation, not connected to the live frontend. |
+| jsdom + React Test Renderer + Node assertions | UI journeys, component checks, and training/data regressions. |
+| GitHub Actions | Automated type checks, builds, tests, and downloadable release artifacts. |
+| Jagoan Hosting + Webuzo / VPS | Current production hosting with manual static-file releases. |
 
 | Location | Purpose |
 | --- | --- |
