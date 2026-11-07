@@ -86,7 +86,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (logsRes.ok) {
         const logsData = await logsRes.json();if(actorRef.current!==userId)return;
         if (logsData.success && Array.isArray(logsData.data)) {
-          const mappedLogs: WorkoutLog[] = logsData.data.filter((item:any)=>!String(item.id).startsWith('demo-session-')).map((item: any) => ({
+          const mappedLogs: WorkoutLog[] = logsData.data.filter((item:any)=>userId==='usr_demo_1'||!String(item.id).startsWith('demo-session-')).map((item: any) => ({
             id: item.id,
             userId: item.userId,
             sessionId: item.sessionId,

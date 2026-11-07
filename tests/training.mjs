@@ -29,8 +29,8 @@ await api('auth/logout',{});assert.ok((await api('auth/login',{email:'a@example.
 console.log('PASS: registration/login, hashed verifier, isolated profiles, persisted library, stage bounds, validated completion, idempotency, local date, save failures, backup/restore, logout.');
 await api('auth/logout',{});
 assert.ok((await api('auth/login',{email:'rizky@sma11.sch.id',kataSandi:'rahasia123'})).success);
-assert.equal((await api('workout-logs')).data.length,0,'V3 does not fabricate demo history');
-assert.equal((await api('library')).data,null);
+assert.equal((await api('workout-logs')).data.length,28,'Explicit demo account receives labelled sample history');
+assert.equal((await api('library')).data.sessionIds.length,9);
 await api('auth/logout',{});await api('auth/login',{email:'a@example.com',kataSandi:'test-password-123'});
 assert.equal((await api('workout-logs')).data.length,1);
-console.log('PASS V3 stops fabricated demo activity and preserves personal records.');
+console.log('PASS explicit demo sample history is isolated from personal records.');

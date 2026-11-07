@@ -5,7 +5,7 @@ import {ArrowRight,ChevronDown,Clock,Layers} from 'lucide-react';
 import {useWorkout} from '@/context/WorkoutContext';
 import {SEED_EXERCISES,SEED_SESSIONS} from '@/lib/seedData';
 import {MobileContainer} from '@/components/layout/MobileContainer';
-import {ActivityCalendar,ActivityChart,DemoNotice,TrainingStats} from '@/prototype/components/TrainingInsights';
+import {ActivityCalendar,ActivityChart,TrainingStats} from '@/prototype/components/TrainingInsights';
 import {getLocalDateString} from '@/src/utils/storage';
 import type {WorkoutLog} from '@/src/types';
 
@@ -30,7 +30,7 @@ export default function HistoryPage(){
  const topFocus=Object.entries(focus).sort((a,b)=>b[1]-a[1]);
  return <div className="min-h-[100dvh] bg-[#15171A] text-[#EEF1F4] overflow-x-hidden"><MobileContainer maxWidth="6xl">
   <div className="flex justify-between gap-3 items-center mb-4"><div><p className="text-[11px] font-bold text-[#FF7A03] uppercase tracking-wider mb-1">Setiap sesi punya cerita</p><h1 className="text-2xl sm:text-3xl font-extrabold">Riwayat & Log Latihan</h1><p className="text-xs sm:text-sm text-[#8A929C] mt-1">Lihat ritmemu, kenali fokusmu, dan buka kembali hasil setiap set.</p></div><img src="/images/mascot/ppt-celebrate.png" alt="Orange Guy merayakan catatan latihan" className="w-16 h-20 sm:w-24 sm:h-24 object-contain"/></div>
-  <DemoNotice/>
+
   <TrainingStats logs={ranged} streak={streak}/>
   <p className="text-[10px] text-[#8A929C] -mt-2 mb-4">Total mengikuti periode pilihan. Streak menunjukkan kondisi saat ini.</p>
   <div className="training-columns">

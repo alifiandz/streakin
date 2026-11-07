@@ -1,3 +1,4 @@
+import {seedDemoProfile} from './demo-data';
 import {googleAccounts} from '../v3/auth/google';
 import { productFor, productRequest, resolveSession, restoreProduct } from '../v3/api';
 import {guidedInfo} from '../v3/guided-training';
@@ -37,6 +38,7 @@ if(url==='/api/auth/me'){
   else {user.nama=identity.nama;user.email=identity.email;}
   db.active=user.id;save(db);
  }else if(user?.authProvider==='google'){db.active=null;save(db);user=undefined;}
+ if(user&&seedDemoProfile(user))save(db);
  return user?reply({success:true,user:pub(user)}):reply({success:false},401);
 }
 if(url==='/api/auth/logout'){await googleAccounts(nativeFetch).signOut();db.active=null;save(db);return reply({success:true})}
@@ -46,7 +48,7 @@ if(url==='/api/auth/register'||url==='/api/auth/login'){
  if(url.endsWith('register')){ensure(String(b.nama||'').trim().length>0,'Nama wajib diisi.');ensure(pass.length>=8,'Kata sandi minimal 8 karakter.');ensure(!p,'Email sudah terdaftar di perangkat ini.');const salt=crypto.randomUUID();p={id:crypto.randomUUID(),nama:String(b.nama).trim().slice(0,80),email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}else{
  if(!p&&email==='rizky@sma11.sch.id'&&pass==='rahasia123'){const salt=crypto.randomUUID();p={id:'usr_demo_1',nama:'Rizky',email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}
  ensure(p&&await password(pass,p.salt)===p.verifier,'Email atau kata sandi salah. Akun perangkat lain memerlukan pemulihan cadangan.');}
- const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}await googleAccounts(nativeFetch).signOut();db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
+ const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}seedDemoProfile(p!);await googleAccounts(nativeFetch).signOut();db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
 if(user?.authProvider==='google'){const identity=await googleAccounts(nativeFetch).current();if(!identity||identity.id!==user.id)return reply({success:false,error:'Sesi Google berakhir. Masuk kembali.'},401);}
 if(!user)return reply({success:false,error:'Masuk terlebih dahulu.'},401);
 if(url.startsWith('/api/v3/')){const data=productRequest(user,url,b,post);if(post)save(db);return reply({success:!data.unavailable,...data},data.unavailable?503:200)}

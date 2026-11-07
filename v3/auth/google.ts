@@ -1,4 +1,5 @@
 import type {SupabaseClient, User as SupabaseUser} from '@supabase/supabase-js';
+import deployedPublicConfig from '../../public/auth-config.json';
 import {safeReturnTo} from '../navigation';
 
 export type GoogleConfig = {supabaseUrl:string;publishableKey:string;googleEnabled:boolean};
@@ -27,7 +28,13 @@ export class GoogleAccounts {
  private startup?:Promise<void>;
  private callbackFailed=false;
  constructor(private request:typeof fetch,private browser:Window,private factory?: (url:string,key:string)=>Promise<SupabaseClient>){}
- config(){return this.configuration??=this.request('/auth-config.json',{cache:'no-store'}).then(async r=>r.ok?validateGoogleConfig(await r.json()):unavailable).catch(()=>unavailable);}
+ config(){return this.configuration??=(async()=>{
+  // Production's public project/key are bundled, so a blocked or stale config request
+  // cannot silently hide Google on a friend's first visit. Supabase verifies sign-in.
+  const origin=new URL(this.browser.location?.href||'https://streakin.invalid/').origin;
+  if(origin==='https://streakin.my.id')return validateGoogleConfig({...deployedPublicConfig,googleEnabled:true});
+  return this.request('/auth-config.json',{cache:'no-store'}).then(async r=>r.ok?validateGoogleConfig(await r.json()):unavailable).catch(()=>unavailable);
+ })();}
  private getClient(){return this.client??=(async()=>{
   const config=await this.config();if(!config.googleEnabled)return null;
   const client=this.factory?await this.factory(config.supabaseUrl,config.publishableKey):(await import('@supabase/supabase-js')).createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',detectSessionInUrl:false,persistSession:true,autoRefreshToken:true,storageKey:'streakin_google_session_v1'}});

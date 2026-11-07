@@ -264,3 +264,5 @@
 .account-google-entry p {font-size:14px;line-height:1.5;color:#a6afb9;margin-top:12px;text-align:center;}
 .account-google-entry .account-google-error {color:#fca5a5;}
 .account-local-label {font-size:14px;font-weight:600;color:#a6afb9;margin-bottom:14px;}
+
+.demo-notice-wrap:has(.demo-notice){width:min(1180px,100%);margin:14px auto 0;padding:0 28px}.demo-notice-wrap .demo-notice{font-size:14px;line-height:1.5;margin:0}.demo-notice-wrap .demo-notice>span{font-size:12px;flex-shrink:0}@media(max-width:767px){.demo-notice-wrap:has(.demo-notice){padding:0 16px}}
