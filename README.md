@@ -21,9 +21,6 @@
   <img src="https://img.shields.io/badge/Hosting-Webuzo%20%2F%20VPS-FF7A03?style=for-the-badge" alt="Hosting Webuzo / VPS" />
 </p>
 
-<p align="center"><img src="public/images/mascot/ppt-welcome.png" alt="Orange Dude smiling and waving hello" height="260" /></p>
-<p align="center"><em>Your next chapter starts with a hello. Let's get moving.</em></p>
-
 ## Stop wondering where to start. Start moving.
 
 **StreakIn brings your calisthenics journey into one place: what to train, how to work toward it, and what to do next.** Go from choosing a goal to following a session, logging your work, and coming back with a clearer next step.
@@ -33,9 +30,6 @@ Build toward your first **L-Sit, Handstand, or Elbow Lever** with illustrated, f
 From a quick session between classes to a focused skill practice, StreakIn puts structure behind the ambition. **Three Free foundation paths. Nine ready-to-follow programs. Unlimited sessions and history. One place to keep showing up.**
 
 **[Find your next move at streakin.my.id →](https://streakin.my.id)**
-
-<p align="center"><img src="public/images/mascot/ppt-explain.png" alt="Orange Dude smiling with open hands, ready to guide you" height="240" /></p>
-<p align="center"><em>Pick your goal. I'll help you find the next step.</em></p>
 
 ## What you can do
 
@@ -50,7 +44,13 @@ From a quick session between classes to a focused skill practice, StreakIn puts 
 
 The Free experience includes all three foundation roadmaps, unlimited sessions and history, and one custom routine. The interface is in Indonesian, with familiar exercise names.
 
-<p align="center"><img src="public/images/mascot/ppt-celebrate.png" alt="Orange Dude, StreakIn’s illustrated training companion" width="220" /></p>
+<p align="center">
+  <img src="public/images/mascot/orange-dude-welcome-shirt.png" alt="Orange Dude in a black StreakIn shirt, waving hello" width="170" />
+  &nbsp;&nbsp;
+  <img src="public/images/mascot/ppt-celebrate.png" alt="The original Orange Dude celebrating in the center" width="220" />
+  &nbsp;&nbsp;
+  <img src="public/images/mascot/orange-dude-confident-shirt.png" alt="Orange Dude in a black StreakIn shirt, standing confidently with folded arms" width="170" />
+</p>
 <p align="center"><em>One set at a time. One step closer.</em></p>
 
 ## Built around real life
