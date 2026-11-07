@@ -21,6 +21,8 @@ export const requirements:Record<string,{equipment:string[];prerequisite:string}
  'l-sit':{equipment:['floor','parallettes'],prerequisite:'Tumpuan tangan stabil dan pergelangan nyaman menerima beban.'},
  handstand:{equipment:['floor','wall'],prerequisite:'Plank terkontrol dan bahu nyaman bergerak di atas kepala.'},
  'elbow-lever':{equipment:['floor'],prerequisite:'Plank terkontrol dan pergelangan nyaman dalam posisi tumpuan.'},
+ planche:{equipment:['floor'],prerequisite:'Tumpuan lengan lurus, bahu aktif dan pergelangan nyaman menerima beban.'},
+ 'muscle-up':{equipment:['bar','low-bar'],prerequisite:'Active hang, strict pull-up terkontrol, dan transisi di palang rendah.'},
  'front-lever':{equipment:['bar'],prerequisite:'Active hang dan tarikan dasar yang terkontrol pada palang kokoh.'},
 };
 export function sessionEquipment(id:string){const session=SEED_SESSIONS.find(s=>s.id===id);return session?workoutEquipment(session):['floor'];}
@@ -31,6 +33,8 @@ const scapular=SEED_EXERCISES.find(e=>e.id==='ex24');if(scapular)scapular.nama='
 if(!SEED_SESSIONS.some(s=>s.id==='s_quick_core_5'))SEED_SESSIONS.push({id:'s_quick_core_5',nama:'Core Singkat 5',durasiMenit:5,fokus:'Pull dan core',exercises:[{exerciseId:'ex9',sets:2,target:4,unit:'reps',istirahatDetik:20},{exerciseId:'ex10',sets:2,target:10,unit:'detik',isIsometric:true,istirahatDetik:20}]});
 
 // Deterministic, stage-bound guided variants; no custom-routine slot is consumed.
+import {addAdvancedTracks} from './advanced-tracks';
+addAdvancedTracks(SEED_SKILLS,SEED_EXERCISES,SEED_SESSIONS);
 import {createGuidedSessions} from './guided-training';
 SEED_SESSIONS.push(...createGuidedSessions(SEED_SESSIONS).filter(s=>!SEED_SESSIONS.some(old=>old.id===s.id)));
 
@@ -45,3 +49,6 @@ const addedPrograms=[
 for(const program of addedPrograms)if(!SEED_SESSIONS.some(s=>s.id===program.id))SEED_SESSIONS.push(program);
 
 const deadBug=SEED_EXERCISES.find(e=>e.id==='ex9');if(deadBug){deadBug.imageUrl='/images/exercises/dead-bug-extension-generated.png';deadBug.langkah=['Telentang. Angkat tangan; tekuk pinggul dan lutut 90°.','Jaga punggung bawah stabil. Luruskan satu lengan dan kaki yang berlawanan.','Kembali perlahan, lalu ganti sisi. Satu sisi = satu repetisi.','Buang napas saat meluruskan. Pendekkan jangkauan bila punggung melengkung.'];deadBug.kesalahanUmum=['Mengangkat kepala atau melakukan sit-up.','Meluruskan lengan dan kaki pada sisi yang sama.','Memaksakan jangkauan hingga punggung bawah melengkung.'];deadBug.lebihMudah='Gerakkan satu kaki; tangan tetap di atas dada';deadBug.lebihSulit='Perlambat gerakan tanpa mengubah posisi punggung';}
+
+import {applyStageArt} from './stage-art';
+applyStageArt(SEED_SKILLS,SEED_EXERCISES);

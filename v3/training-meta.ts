@@ -1,6 +1,9 @@
 import type {WorkoutSession} from '../src/types';
-export const equipmentLabels:Record<string,string>={floor:'Lantai',wall:'Dinding',bar:'Palang kokoh',parallettes:'Parallettes / tumpuan sejajar',support:'Tumpuan tinggi stabil'};
+export const equipmentLabels:Record<string,string>={floor:'Lantai',wall:'Dinding',bar:'Palang kokoh',parallettes:'Parallettes / tumpuan sejajar',support:'Tumpuan tinggi stabil','low-bar':'Palang rendah','dip-bars':'Dip bars',rings:'Gymnastic rings',bands:'Resistance band',mat:'Matras',bench:'Bangku stabil',box:'Box latihan',vest:'Weighted vest',dumbbells:'Dumbbell'};
 export function exerciseEquipment(id:string):string[]{
+ if(id.startsWith('pl_'))return ['floor'];
+ if(id==='mu_4')return ['floor','low-bar'];
+ if(id.startsWith('mu_'))return ['floor','bar'];
  if(id.startsWith('fl_')||['ex5','ex6'].includes(id))return ['floor','bar'];
  if(['ex1','ex2','ex11','ex12','ex13'].includes(id))return ['floor','parallettes'];
  if(['ex3','ex4','ex14','ex15'].includes(id))return ['floor','wall'];
@@ -8,7 +11,7 @@ export function exerciseEquipment(id:string):string[]{
  return ['floor'];
 }
 export function workoutEquipment(session:WorkoutSession){return [...new Set(session.exercises.flatMap(e=>exerciseEquipment(e.exerciseId)))];}
-export function missingEquipment(session:WorkoutSession,available:string[]){return workoutEquipment(session).filter(id=>!available.includes(id));}
+export function missingEquipment(session:WorkoutSession,available:string[]){return workoutEquipment(session).filter(id=>!available.includes(id)&&!(id==='support'&&available.some(e=>['bench','box'].includes(e)))&&!(id==='parallettes'&&available.includes('dip-bars')));}
 const presets:Record<string,{goal:string;category:string;difficulty:string;short:string}>={
  s_quick_core_5:{goal:'Aktivasi inti tubuh dalam sesi singkat',category:'core',difficulty:'Pemula',short:'Inti tubuh'},
  s4:{goal:'Dorong dan stabilkan tubuh',category:'full',difficulty:'Dasar',short:'Seluruh tubuh'},
@@ -26,12 +29,16 @@ export function workoutMeta(session:WorkoutSession){
 }
 export function shortDuration(seconds:number){if(seconds<60)return `${Math.max(0,Math.round(seconds))} dtk`;return `${Math.round(seconds/60)} menit`;}
 export const milestoneLabels:Record<string,string[]>={
+ planche:['Lean','Tuck','Advanced tuck','Straddle','Penuh'],
+ 'muscle-up':['Gantung aktif','Tarikan','Tarikan tinggi','Transisi','Muscle-Up'],
  'l-sit':['Tumpuan','Tuck','Satu kaki','Straddle','L-Sit penuh'],
  handstand:['Adaptasi','Dinding','Keseimbangan','Kick-up','Mandiri'],
  'elbow-lever':['Tumpuan siku','Lutut dibantu','Tuck','Straddle','Tubuh lurus'],
  'front-lever':['Tuck','Advanced tuck','Satu kaki','Straddle','Penuh'],
 };
 export const skillThemes:Record<string,{focus:string;hook:string}>={
+ planche:{focus:'Dorong lengan lurus',hook:'Dari lean bertumpu kaki ke tubuh horizontal.'},
+ 'muscle-up':{focus:'Tarikan & transisi',hook:'Dari gantung aktif ke dukungan di atas palang.'},
  'l-sit':{focus:'Kontrol inti & tumpuan',hook:'Dari tumpuan bahu menuju kedua kaki lurus.'},
  handstand:{focus:'Bahu & keseimbangan',hook:'Bangun rasa nyaman terbalik sebelum berdiri mandiri.'},
  'elbow-lever':{focus:'Tumpuan siku & keseimbangan',hook:'Kurangi bantuan kaki sampai tubuh bisa melayang.'},

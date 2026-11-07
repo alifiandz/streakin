@@ -8,7 +8,8 @@
 | Handstand Foundations | All 5 stages | Same | Implemented; no paid stage gates |
 | Elbow Lever | All 5 stages retained | Same | Track retained; generated full-pose image added, earlier-stage exact art still missing |
 | Front Lever specialization | Discoverable stage preview | Instructions, sessions and progression | Implemented, gated in routes and local API; server grant policy tested |
-| Planche, Muscle-Up, Advanced Handstand | Future discovery labels | Future tracks | Not yet available; explicitly labelled |
+| Planche + Muscle-Up | Discoverable previews | 5 stages each, tutorials, sessions and progress | Implemented with images, Pro gates and rep/time targets |
+| V-Sit, Back Lever, Human Flag, One-Arm Handstand, Pistol Squat | Coming-soon choices | Coming-soon choices | Explicitly disabled; no fake lessons |
 | Essential tutorials | Included | Included | Technique details, requirements, easier/harder variations |
 | Preset workouts | 9 | Same | Nine goal-specific programs, all with review, player and completion |
 | Workout sessions / hold & rest timers | Unlimited | Unlimited | Existing wall-clock timers retained; review/start, pause, checkpoints, typed results and acknowledged completion |

@@ -1,8 +1,8 @@
 import type {WorkoutSession} from '../lib/seedData';
 export const guidedTimes=[5,10,15,20,30,45,60];
 export function guidedInfo(id:string){
- const m=/^guided_(l-sit|handstand|elbow-lever|front-lever|foundation)_([1-5])_(5|10|15|20|30|45|60)$/.exec(id);if(!m)return null;
- return {skillId:m[1],stage:Number(m[2]),minutes:Number(m[3]),warmupSec:m[1]==='handstand'||m[1]==='front-lever'?120:60,cooldownSec:30};
+ const m=/^guided_(l-sit|handstand|elbow-lever|front-lever|planche|muscle-up|foundation)_([1-5])_(5|10|15|20|30|45|60)$/.exec(id);if(!m)return null;
+ return {skillId:m[1],stage:Number(m[2]),minutes:Number(m[3]),warmupSec:['handstand','front-lever','planche','muscle-up'].includes(m[1])?120:60,cooldownSec:30};
 }
 export function guidedId(skillId:string,stage:number,minutes:number){return `guided_${skillId}_${stage}_${minutes}`;}
 export function createGuidedSessions(sessions:WorkoutSession[]):WorkoutSession[]{

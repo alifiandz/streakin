@@ -1,4 +1,5 @@
-import {SEED_EXERCISES,SEED_SESSIONS} from './catalog';
+import {equipmentOptions} from './preference-options';
+import {SEED_SKILLS,SEED_EXERCISES,SEED_SESSIONS} from './catalog';
 import {assertRoutineLimit,canTrain,emptyProduct,quota,isProExercise,trainingTimeOptions,type ProductState,type Routine} from './model';
 const requireValue=(ok:unknown,message:string)=>{if(!ok)throw Error(message);};
 export function productFor(profile:any):ProductState{
@@ -20,8 +21,8 @@ export function productRequest(profile:any,path:string,body:any,post:boolean){
  if(path==='/api/v3/preferences'){
   const p=body.preferences;requireValue(p&&['new','some','experienced'].includes(p.experience)&&['consistency','strength','skills'].includes(p.goal),'Preferensi tidak valid.');
   requireValue(Number.isInteger(p.frequency)&&p.frequency>=1&&p.frequency<=7,'Frekuensi harus 1–7 hari.');
-  requireValue(Array.isArray(p.skills)&&p.skills.length<=4&&p.skills.every((id:string)=>['l-sit','handstand','elbow-lever','front-lever'].includes(id)),'Pilihan skill tidak valid.');
-  requireValue(Array.isArray(p.equipment)&&p.equipment.every((id:string)=>['floor','wall','bar','parallettes','support'].includes(id)),'Pilihan alat tidak valid.');
+  requireValue(Array.isArray(p.skills)&&p.skills.length<=6&&p.skills.every((id:string)=>SEED_SKILLS.some(skill=>skill.id===id)),'Pilihan skill tidak valid.');
+  requireValue(Array.isArray(p.equipment)&&p.equipment.every((id:string)=>equipmentOptions.some(([key])=>key===id)),'Pilihan alat tidak valid.');
   new Intl.DateTimeFormat('en-US',{timeZone:p.timeZone||'Asia/Jakarta'}).format();
   const timeMinutes=p.timeMinutes??15;requireValue(trainingTimeOptions.includes(timeMinutes),'Waktu sesi tidak valid.');
   const assessment=p.assessment??{plank:'unknown',pushups:'unknown'};requireValue(assessment&&['unknown','under15','15to30','over30'].includes(assessment.plank)&&['unknown','0to4','5to10','over10'].includes(assessment.pushups),'Asesmen tidak valid.');

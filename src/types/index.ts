@@ -6,6 +6,7 @@ export interface User {
 }
 
 export interface SkillStage {
+  unit?: 'reps' | 'detik';
   stageNumber: number; // 1 to 5
   nama: string;
   deskripsi: string;

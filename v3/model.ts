@@ -8,8 +8,8 @@ export interface Routine extends WorkoutSession {custom:true;createdAt:string;up
 export interface ProductState {testTier:Tier;preferences:Preferences;routines:Routine[];schedule:{days:number[];time:string};usage:Record<string,number>;leases:Record<string,string>;}
 export const defaultPreferences:Preferences={timeMinutes:15,assessment:{plank:'unknown',pushups:'unknown'},experience:'new',goal:'consistency',skills:['l-sit'],equipment:['floor'],frequency:3,onboarded:false,timeZone:'Asia/Jakarta'};
 export function emptyProduct():ProductState{return {testTier:'free',preferences:{...defaultPreferences,skills:[...defaultPreferences.skills],equipment:['floor']},routines:[],schedule:{days:[],time:'16:00'},usage:{},leases:{}};}
-export const isProExercise=(id:string)=>id.startsWith('fl_')||id==='ex6';
-export const isProSkill=(id?:string)=>id==='front-lever';
+export const isProExercise=(id:string)=>['fl_','pl_','mu_'].some(prefix=>id.startsWith(prefix))||id==='ex6';
+export const isProSkill=(id?:string)=>['front-lever','planche','muscle-up'].includes(id||'');
 export const presetIds=['s1','s2','s_legs_10','s4','s5','s_quick_core_5','s_core_15','s_legs_20','s_mobility_10'];
 export function policy(tier:Tier){return {tier,customRoutineLimit:tier==='pro'?null:1,aiMonthlyLimit:tier==='pro'?5:1,advancedAnalytics:tier==='pro',specializedSkills:tier==='pro'};}
 export function monthKey(date=new Date(),timeZone='Asia/Jakarta'){const parts=new Intl.DateTimeFormat('en-US',{timeZone,year:'numeric',month:'2-digit'}).formatToParts(date);return `${parts.find(p=>p.type==='year')!.value}-${parts.find(p=>p.type==='month')!.value}`;}

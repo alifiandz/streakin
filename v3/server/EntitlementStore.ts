@@ -6,7 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {randomUUID,timingSafeEqual} from 'node:crypto';
 import {productRequest} from '../api';
 import {SEED_SESSIONS,SEED_EXERCISES} from '../catalog';
-import {canTrain,emptyProduct,monthKey,policy,type Tier} from '../model';
+import {canTrain,isProSkill,emptyProduct,monthKey,policy,type Tier} from '../model';
 import type {WorkoutSession} from '../../src/types';
 const ensure=(value:unknown,message:string)=>{if(!value)throw Error(message);};
 export class EntitlementStore {
@@ -37,7 +37,7 @@ export class EntitlementStore {
   const routine=result.routine!;this.db.prepare('INSERT INTO routines VALUES (?,?,?) ON CONFLICT(user_id,id) DO UPDATE SET payload=excluded.payload').run(userId,routine.id,JSON.stringify(routine));return routine;
  });}
  stage(userId:string,skillId:string){this.user(userId);return Number((this.db.prepare('SELECT stage FROM skill_progress WHERE user_id=? AND skill_id=?').get(userId,skillId) as any)?.stage||1);}
- advanceStage(userId:string,skillId:string,next:number){return this.transaction(()=>{this.user(userId);ensure(skillId!=='front-lever'||this.tier(userId)==='pro','Pro required');ensure(SEED_SESSIONS.some(s=>s.skillId===skillId),'Unknown skill');const old=this.stage(userId,skillId);ensure(Number.isInteger(next)&&next>=1&&next<=5&&next<=old+1,'One stage at a time');this.db.prepare('INSERT INTO skill_progress VALUES (?,?,?) ON CONFLICT(user_id,skill_id) DO UPDATE SET stage=excluded.stage').run(userId,skillId,next);});}
+ advanceStage(userId:string,skillId:string,next:number){return this.transaction(()=>{this.user(userId);ensure(!isProSkill(skillId)||this.tier(userId)==='pro','Pro required');ensure(SEED_SESSIONS.some(s=>s.skillId===skillId),'Unknown skill');const old=this.stage(userId,skillId);ensure(Number.isInteger(next)&&next>=1&&next<=5&&next<=old+1,'One stage at a time');this.db.prepare('INSERT INTO skill_progress VALUES (?,?,?) ON CONFLICT(user_id,skill_id) DO UPDATE SET stage=excluded.stage').run(userId,skillId,next);});}
  startWorkout(userId:string,sessionId:string){this.user(userId);const session:WorkoutSession|undefined=SEED_SESSIONS.find(s=>s.id===sessionId)||this.routines(userId).find(r=>r.id===sessionId);ensure(session,'Workout not found');ensure(canTrain(session!,this.tier(userId)),'Pro required');ensure(!session!.skillId||!session!.stageNumber||session!.stageNumber<=this.stage(userId,session!.skillId),'Stage not unlocked');const token=randomUUID();this.db.prepare('INSERT INTO workout_grants VALUES (?,?,?)').run(token,userId,JSON.stringify(session));return {token,session};}
  finishWorkout(userId:string,token:string,input:any){return this.transaction(()=>{
   this.user(userId);const grant=this.db.prepare('SELECT payload FROM workout_grants WHERE token=? AND user_id=?').get(token,userId) as any;ensure(grant,'Workout authorization missing');

@@ -411,6 +411,8 @@ export default function WorkoutPlayerPage() {
   ).length;
 
   // Navigate to next exercise or finish session
+  useEffect(()=>{try{window.scrollTo({top:0,behavior:'auto'});}catch{}},[exerciseIndex]);
+
   const handleNextOrFinish = async (finishGuided=false) => {
     if(guide&&!guideWarmupDone)return;
     if (isFinishing) return;
@@ -467,7 +469,7 @@ export default function WorkoutPlayerPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#15171A] text-[#EEF1F4] flex flex-col justify-between overflow-x-hidden">
+    <div className="workout-player min-h-[100dvh] bg-[#15171A] text-[#EEF1F4]">
       {/* Top Header Bar with Safe Area Top */}
       <div className="sticky top-0 z-30 bg-[#15171A]/95 backdrop-blur border-b border-[#2E3238] px-3.5 sm:px-4 py-2 sm:py-2.5 pt-[env(safe-area-inset-top,0.5rem)]">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
@@ -538,7 +540,7 @@ export default function WorkoutPlayerPage() {
       <MobileContainer
         maxWidth="xl"
         withBottomNav={false}
-        className="pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))]"
+        className="workout-player-main"
       >
         {guide&&<GuidedCoach sessionId={session.id} elapsed={elapsedActiveSec} exercise={currentExerciseData} index={exerciseIndex} total={totalExercises} warmupDone={guideWarmupDone} onWarmupDone={()=>setGuideWarmupDone(true)} resting={timerRunning} restSeconds={timerSeconds} cooldownAt={guideCooldownAt} onFinish={()=>void handleNextOrFinish(true)} busy={isFinishing}/>}
         <div hidden={!!guide&&(!guideWarmupDone||guideCooldownAt!==null)}>
@@ -860,7 +862,7 @@ export default function WorkoutPlayerPage() {
       </MobileContainer>
 
       {/* Sticky Bottom Action - Ergonomis satu jempol, safe-area bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-[#15171A]/95 backdrop-blur border-t border-[#2E3238] z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+      <div hidden={!!guide&&(!guideWarmupDone||guideCooldownAt!==null)} className="workout-player-footer fixed bottom-0 left-0 right-0 p-3 sm:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] bg-[#15171A]/95 backdrop-blur border-t border-[#2E3238] z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
         <div className="max-w-xl mx-auto">
           <button
             type="button"

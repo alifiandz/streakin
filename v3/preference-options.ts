@@ -1,0 +1,2 @@
+export const futureSkills=['V-Sit','Back Lever','Human Flag','One-Arm Handstand','Pistol Squat'];
+export const equipmentOptions=[['floor','Lantai'],['wall','Dinding'],['support','Tumpuan stabil'],['parallettes','Parallettes'],['bar','Palang'],['low-bar','Palang rendah'],['dip-bars','Dip bars'],['rings','Gymnastic rings'],['bands','Resistance band'],['mat','Matras'],['bench','Bangku stabil'],['box','Box latihan'],['vest','Weighted vest'],['dumbbells','Dumbbell']] as const;
