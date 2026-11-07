@@ -3,8 +3,8 @@
 </p>
 
 <h1 align="center">StreakIn</h1>
-<p align="center"><strong>Big skills start with one small session.</strong></p>
-<p align="center">Guided calisthenics for students with busy schedules.<br />Choose your time. Find your next step. Make it count.</p>
+<p align="center"><strong>Build strength. Learn skills. Own your progress.</strong></p>
+<p align="center">Your all-in-one calisthenics app for turning ambition into action.<br />Skill roadmaps. Guided workouts. Custom routines. Progress you can see.</p>
 <p align="center"><a href="https://streakin.my.id"><strong>Try StreakIn live →</strong></a> · <a href="#what-you-can-do">Explore the features</a> · <a href="#run-it-locally">Run it locally</a></p>
 <p align="center"><a href="https://github.com/alifiandz/streakin/actions/workflows/verify.yml"><img src="https://github.com/alifiandz/streakin/actions/workflows/verify.yml/badge.svg" alt="StreakIn build and tests" /></a></p>
 
@@ -23,11 +23,32 @@
 
 ## Stop wondering where to start. Start moving.
 
-School, assignments, and a packed day can make training feel like something for later. StreakIn turns a big goal, such as your first L-Sit, Handstand, or Elbow Lever, into a session you can follow today.
+**StreakIn brings your calisthenics journey into one place: what to train, how to work toward it, and what to do next.** Go from choosing a goal to following a session, logging your work, and coming back with a clearer next step.
 
-Pick **5, 10, 15, or 30 minutes**, see the equipment you need, and follow the warm-up, exercises, timers, and rest periods. Come back to a record of what you actually completed.
+Build toward your first **L-Sit, Handstand, or Elbow Lever** with illustrated, five-stage roadmaps. Choose a **5, 10, 15, or 30-minute** session, train with hold and rest timers, create your own routines, and track completed workouts, skill records, and milestones. Recommendations account for your available time, equipment, and selected ability.
 
-**[Open streakin.my.id →](https://streakin.my.id)**
+From a quick session between classes to a focused skill practice, StreakIn puts structure behind the ambition. **Three Free foundation paths. Nine ready-to-follow programs. Unlimited sessions and history. One place to keep showing up.**
+
+**[Find your next move at streakin.my.id →](https://streakin.my.id)**
+
+## See the skills. Build the foundations.
+
+Meet Orange Dude, the illustrated training companion throughout StreakIn. These are actual assets from the app's skill library.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="public/images/skills/lsit-skill-full-hold.png" alt="Orange Dude performing an L-Sit on parallettes" width="200" /><br /><strong>L-Sit</strong><br /><sub>Free foundation roadmap</sub></td>
+    <td align="center" width="33%"><img src="public/images/skills/hs-skill-chest-to-wall.png" alt="Orange Dude practicing a chest-to-wall handstand" height="190" /><br /><strong>Handstand</strong><br /><sub>Chest-to-wall progression</sub></td>
+    <td align="center" width="33%"><img src="public/images/skills/elbow-lever-full-generated.png" alt="Orange Dude performing an Elbow Lever" width="250" /><br /><strong>Elbow Lever</strong><br /><sub>Free foundation roadmap</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="public/images/skills/fl-skill-full-lever-hold.png" alt="Orange Dude illustrating a Front Lever" width="250" /><br /><strong>Front Lever</strong><br /><sub>Pro path preview</sub></td>
+    <td align="center"><img src="public/images/skills/pl-5.png" alt="Orange Dude illustrating a full Planche" width="250" /><br /><strong>Planche</strong><br /><sub>Pro path preview</sub></td>
+    <td align="center"><img src="public/images/skills/mu-5.png" alt="Orange Dude in the top support position of a Muscle-Up" height="190" /><br /><strong>Muscle-Up</strong><br /><sub>Top support position, Pro preview</sub></td>
+  </tr>
+</table>
+
+**Six skill paths. Thirty progression stages. A next step you can actually follow.** Foundation paths are Free; specialist paths are available in the Pro preview. See the current project status below for integration details.
 
 ## What you can do
 
