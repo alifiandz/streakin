@@ -2,13 +2,13 @@
 
 ## Current status
 
-The application now includes a Supabase Auth adapter using Google's authorization-code flow with PKCE, validated sessions, logout, error handling and safe workout return links. **Google login is not activated:** StreakIn has no selected/connected Supabase project and no Google OAuth client yet. `public/auth-config.json` deliberately keeps `googleEnabled: false`. The Google button is shown only when that configuration is valid and enabled.
+The application now includes a Supabase Auth adapter using Google's authorization-code flow with PKCE, validated sessions, logout, error handling and safe workout return links. **Google login is not activated:** the dedicated StreakIn project is connected, but its Google provider is disabled and a Google OAuth client still needs configuration. `public/auth-config.json` deliberately keeps `googleEnabled: false`. The Google button is shown only when that configuration is valid and enabled.
 
-The connected organization named `myway` was explicitly declined for this project. Do not provision StreakIn there. Await the user's chosen organization, discover it through Supabase, and check project cost before provisioning if required. Do not reuse the existing MyWay database or its auth configuration.
+Verified project: `xnxczexshsxpqymhbdzx`, name `StreakIn`, organization `dyfxahydireejfcbwtjw`, region Tokyo, status `ACTIVE_HEALTHY`. Reuse this existing project. Its public Auth settings report `external.google: false`. The application configuration now contains its real project URL and publishable key, with Google deliberately disabled until provider setup is complete. Do not reuse the MyWay project.
 
 ## 1. Create the dedicated Supabase project
 
-Create `StreakIn` in the user's selected organization (Singapore is suitable for the intended Indonesian audience). Use Supabase's returned project reference and URL; never invent a reference. A paid cost requires the user's agreement before creation.
+This step is complete: reuse the existing StreakIn project. No new project or organization needs to be created.
 
 No training-data schema is needed to enable this account adapter. It authenticates through Supabase Auth; training records remain browser-local and must not be advertised as synchronized or secured by a production API. Do not turn on server-paid entitlements based on the browser's Pro test setting.
 
@@ -22,7 +22,7 @@ Open [Google Auth Platform](https://console.cloud.google.com/auth/overview), usi
 4. Create a **Web application** OAuth client.
 5. Set the Google **Authorized redirect URI** to the callback shown by Supabase's Google provider settings, normally:
 
-   `https://<actual-project-ref>.supabase.co/auth/v1/callback`
+   `https://xnxczexshsxpqymhbdzx.supabase.co/auth/v1/callback`
 
    Use the actual returned project reference. **This replaces the old planned `streakin.my.id/api/auth/google/callback` address.** Google redirects to Supabase, which exchanges the Google authorization code and returns the browser to StreakIn. Do not add a `/#/` fragment to Google's callback.
 6. Enter the Google client ID and client secret directly into **Supabase → Authentication → Sign In / Providers → Google**. Enable the provider. Keep the secret out of chat, source, Sites public files and browser environment variables. The app uses Supabase's hosted authorize endpoint, so no Google browser SDK origin is needed for this flow.
@@ -49,7 +49,7 @@ After Google and the Supabase redirect URLs are configured, obtain the project's
 
 ```json
 {
-  "supabaseUrl": "https://<actual-project-ref>.supabase.co",
+  "supabaseUrl": "https://xnxczexshsxpqymhbdzx.supabase.co",
   "publishableKey": "<actual-sb_publishable-key>",
   "googleEnabled": true
 }
@@ -81,3 +81,11 @@ Before marking Google login operational, manually verify with an actual configur
 6. Another device signs into the same verified account but sees only its own local training until real synchronization is implemented.
 
 References: [Supabase Google login](https://supabase.com/docs/guides/auth/social-sign-in/auth-google), [PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow), [getUser](https://supabase.com/docs/reference/javascript/auth-getuser).
+
+## Direct setup links for the connected project
+
+- [Google provider settings](https://supabase.com/dashboard/project/xnxczexshsxpqymhbdzx/auth/providers): enter the Google client ID and secret, then enable Google.
+- [Supabase return URL settings](https://supabase.com/dashboard/project/xnxczexshsxpqymhbdzx/auth/url-configuration): use the exact current Sites callback above.
+- [Google OAuth clients](https://console.cloud.google.com/auth/clients): create the Web application client and register `https://xnxczexshsxpqymhbdzx.supabase.co/auth/v1/callback`.
+
+Do not send the Google client secret in chat. After the owner configures the provider and return URL, recheck `/auth/v1/settings`, verify the actual OAuth redirect, enable the existing app configuration, publish and test a real user login.

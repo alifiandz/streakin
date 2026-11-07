@@ -165,3 +165,8 @@ Implemented the official Supabase Auth SDK adapter for Google PKCE sign-in, code
 **Activation remains blocked by infrastructure:** the user declined the only connected Supabase organization (`myway`) and will supply a different one. No StreakIn project or Google OAuth client exists yet. Public auth configuration remains disabled, and no working Google login, cloud synchronization, real email account service, server authorization or paid entitlement is claimed. Follow `GOOGLE_SIGN_IN_SETUP.md` using the actual selected project reference; its Supabase callback supersedes the old planned custom callback.
 
 Automated provider tests cover consent/code errors, PKCE exchange once, address-bar cleanup, verified identity, unverified/expired-session rejection, logout, safe return, stable user ID, separation from a same-email device profile, retained skill data and return visits. Live Google consent and cross-device identity tests require the real provider configuration. Training-data synchronization remains a separate P0 dependency.
+
+
+## StreakIn auth project connected — 7 November 2026
+
+Verified the existing dedicated project `xnxczexshsxpqymhbdzx` (organization `dyfxahydireejfcbwtjw`, Tokyo, healthy). Retrieved its enabled publishable key and stored only public connection configuration in `public/auth-config.json`. Public Auth settings confirm Google is disabled. The app flag remains false, so the UI cannot offer a nonworking Google login. Google OAuth client/provider configuration and exact return-URL setup remain owner setup steps; the available connector cannot edit Auth provider settings. No new infrastructure was created and no MyWay data was touched.
