@@ -149,3 +149,11 @@ All **30 roadmap stages** now have local PNG artwork and matching primary exerci
 The exact “Pratinjau · checkout belum tersedia” caption beneath Beli sekarang is removed. Pro benefits now describe the three specializations, routine flexibility, relevant sessions and performance trends. The purchase action still honestly explains that no payment/subscription has been created; no checkout is fabricated.
 
 Added verification covers both new Pro tracks through all stages and final confirmation, Free gates, server gates, equipment persistence, coming-soon choices, unit-aware Muscle-Up UI, a complete Pro workout, celebration without new activity, and warmup footer/layout guards. Original data schema and records remain compatible; no existing training data is deleted.
+
+## Landing-page refinement
+
+The signed-out landing page retains the original centered headline, SMA/SMK badge, orange/black palette and Orange Dude identity. Its narrative now moves through three illustrated Free foundations, concrete product facts, an interactive real-session preview, planned weekly time, the three Pro specializations, concise FAQs and a final invitation.
+
+The preview changes time and foundation focus using existing deterministic guided sessions. It shows actual stage-one sets, exercise images and equipment, and preserves the chosen guide through the registration deep link. A weekly time planner multiplies selected minutes by 2/3/4 days; it is labelled planned time, not logged activity or predicted fitness gains. Guest exploration never writes fake accounts or progress. Pricing copy now reflects approved Rp49.000 while keeping operational limitations honest in FAQ/details.
+
+Layouts use normal-flow grid/flex composition with fixed image areas and responsive stacking; no text/mascot overlays or absolute-positioned promotional cards. Small image motion is bounded and disabled for reduced motion. Additional tests cover the preview, time/focus controls, equipment, weekly calculation, registration link, FAQs and artwork existence. Type/build/interaction checks passed; live visual layout QA retains the browser-infrastructure limitation documented above.
