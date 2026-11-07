@@ -1,10 +1,11 @@
+import {googleAccounts} from '../v3/auth/google';
 import { productFor, productRequest, resolveSession, restoreProduct } from '../v3/api';
 import {guidedInfo} from '../v3/guided-training';
 import { canTrain,isProSkill } from '../v3/model';
 import { SEED_SESSIONS, SEED_SKILLS } from '../v3/catalog';
 import { getLocalDateString } from '../src/utils/storage';
 const nativeFetch=window.fetch.bind(window);export const KEY='streakin_training_v2';
-type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[];demoSeedVersion?:number};
+type Profile={id:string;nama:string;email:string;salt:string;verifier:string;library:any;skills:any[];logs:any[];demoSeedVersion?:number;authProvider?:'google'};
 type DB={version:2;active:string|null;profiles:Profile[]};
 function read():DB{
  const raw=localStorage.getItem(KEY);if(!raw)return {version:2,active:null,profiles:[]};
@@ -21,20 +22,32 @@ function read():DB{
 }
 function save(d:DB){localStorage.setItem(KEY,JSON.stringify(d))}
 function reply(data:any,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}})}
-const pub=(p:Profile)=>({id:p.id,nama:p.nama,email:p.email});
+const pub=(p:Profile)=>({id:p.id,nama:p.nama,email:p.email,authProvider:p.authProvider||'local',needsOnboarding:!productFor(p).preferences.onboarded});
 const hex=(b:ArrayBuffer)=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
 async function password(value:string,salt:string){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(value),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:210000,hash:'SHA-256'},key,256))}
 function ensure(v:any,msg:string){if(!v)throw Error(msg)}
 window.fetch=(async(input:RequestInfo|URL,options?:RequestInit)=>{const url=typeof input==='string'?input:input instanceof URL?input.pathname:input.url;if(!url.startsWith('/api/'))return nativeFetch(input,options);try{const db=read();const b=JSON.parse(String(options?.body||'{}'));const post=options?.method==='POST';let user=db.profiles.find(p=>p.id===db.active);
-if(url==='/api/auth/me')return user?reply({success:true,user:pub(user)}):reply({success:false},401);
-if(url==='/api/auth/logout'){db.active=null;save(db);return reply({success:true})}
+if(url==='/api/auth/config'){const config=await googleAccounts(nativeFetch).config();return reply({success:true,googleEnabled:config.googleEnabled});}
+if(url==='/api/auth/google'&&post){await googleAccounts(nativeFetch).start(b.next);return reply({success:true,redirecting:true});}
+if(url==='/api/auth/me'){
+ const identity=await googleAccounts(nativeFetch).current();
+ if(identity){
+  user=db.profiles.find(p=>p.id===identity.id&&p.authProvider==='google');
+  if(!user){user={...identity,authProvider:'google',salt:'',verifier:'',library:null,skills:[],logs:[]};db.profiles.push(user);}
+  else {user.nama=identity.nama;user.email=identity.email;}
+  db.active=user.id;save(db);
+ }else if(user?.authProvider==='google'){db.active=null;save(db);user=undefined;}
+ return user?reply({success:true,user:pub(user)}):reply({success:false},401);
+}
+if(url==='/api/auth/logout'){await googleAccounts(nativeFetch).signOut();db.active=null;save(db);return reply({success:true})}
 if(url==='/api/auth/register'||url==='/api/auth/login'){
  const email=String(b.email||'').trim().toLowerCase(),pass=String(b.kataSandi||'');ensure(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),'Format email tidak valid.');
- let p=db.profiles.find(x=>x.email===email);
+ let p=db.profiles.find(x=>x.email===email&&!x.authProvider);
  if(url.endsWith('register')){ensure(String(b.nama||'').trim().length>0,'Nama wajib diisi.');ensure(pass.length>=8,'Kata sandi minimal 8 karakter.');ensure(!p,'Email sudah terdaftar di perangkat ini.');const salt=crypto.randomUUID();p={id:crypto.randomUUID(),nama:String(b.nama).trim().slice(0,80),email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}else{
  if(!p&&email==='rizky@sma11.sch.id'&&pass==='rahasia123'){const salt=crypto.randomUUID();p={id:'usr_demo_1',nama:'Rizky',email,salt,verifier:await password(pass,salt),library:null,skills:[],logs:[]};db.profiles.push(p)}
  ensure(p&&await password(pass,p.salt)===p.verifier,'Email atau kata sandi salah. Akun perangkat lain memerlukan pemulihan cadangan.');}
- const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
+ const legacy=localStorage.getItem('streakin_friend_prototype_data_v1');if(legacy&&!p!.logs.length&&!p!.library){try{const old=JSON.parse(legacy);if(old.user?.email===email){p!.logs=old.logs||[];p!.skills=old.skills||[];p!.library=old.library||null}}catch{}}await googleAccounts(nativeFetch).signOut();db.active=p!.id;save(db);return reply({success:true,user:pub(p!)})}
+if(user?.authProvider==='google'){const identity=await googleAccounts(nativeFetch).current();if(!identity||identity.id!==user.id)return reply({success:false,error:'Sesi Google berakhir. Masuk kembali.'},401);}
 if(!user)return reply({success:false,error:'Masuk terlebih dahulu.'},401);
 if(url.startsWith('/api/v3/')){const data=productRequest(user,url,b,post);if(post)save(db);return reply({success:!data.unavailable,...data},data.unavailable?503:200)}
 if(url==='/api/backup'){

@@ -6,6 +6,8 @@ import { safeLocalStorage, STORAGE_KEYS, initStorageData } from '@/src/utils/sto
 
 interface AuthContextType {
   currentUser: User | null;
+  googleEnabled: boolean;
+  loginGoogle: (next?: string | null) => Promise<{success:boolean;error?:string}>;
   loading: boolean;
   theme: 'dark' | 'light';
   toggleTheme: () => void;
@@ -19,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [googleEnabled,setGoogleEnabled]=useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // Load theme and stored user on mount (client-only to prevent hydration mismatch)
@@ -55,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: data.user.id,
               nama: data.user.nama,
               email: data.user.email,
+              authProvider: data.user.authProvider||'local',
+              needsOnboarding:data.user.needsOnboarding===true,
               kataSandi: '',
             };
             setCurrentUser(userObj);
@@ -62,12 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } else {setCurrentUser(null);safeLocalStorage.removeItem(STORAGE_KEYS.CURRENT_USER);}
       } catch (err) {
-        console.error('Gagal mengecek sesi login ke MySQL:', err);
+        console.error('Gagal memeriksa sesi akun:', err);
       } finally {
         setLoading(false);
       }
     }
     checkMe();
+    fetch('/api/auth/config').then(r=>r.json()).then(data=>setGoogleEnabled(data.googleEnabled===true)).catch(()=>setGoogleEnabled(false));
+    const changed=()=>{setCurrentUser(null);safeLocalStorage.removeItem(STORAGE_KEYS.CURRENT_USER);};
+    window.addEventListener('streakin-auth-changed',changed);
+    return()=>window.removeEventListener('streakin-auth-changed',changed);
   }, []);
 
   // [MODE TERANG DINONAKTIFKAN SEMENTARA - SEGERA HADIR]
@@ -95,6 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: data.user.id,
         nama: data.user.nama,
         email: data.user.email,
+              authProvider: data.user.authProvider||'local',
+              needsOnboarding:data.user.needsOnboarding===true,
         kataSandi: '',
       };
 
@@ -128,6 +139,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: data.user.id,
         nama: data.user.nama,
         email: data.user.email,
+              authProvider: data.user.authProvider||'local',
+              needsOnboarding:data.user.needsOnboarding===true,
         kataSandi: '',
       };
 
@@ -143,20 +156,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = async () => {
+  const loginGoogle = async (next?:string|null) => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setCurrentUser(null);
-      safeLocalStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-    }
+      const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({next})});
+      const data=await res.json();
+      return res.ok&&data.success?{success:true}:{success:false,error:data.error||'Google login belum dapat dimulai.'};
+    }catch{return {success:false,error:'Koneksi login gagal. Coba lagi.'};}
+  };
+  const logout = async () => {
+    const res=await fetch('/api/auth/logout',{method:'POST'});
+    const data=await res.json();
+    if(!res.ok||!data.success)throw Error(data.error||'Belum berhasil keluar. Coba lagi.');
+    setCurrentUser(null);
+    safeLocalStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   };
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, loading, theme, toggleTheme, login, register, logout }}
+      value={{ currentUser, loading, googleEnabled, loginGoogle, theme, toggleTheme, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>

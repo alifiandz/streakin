@@ -1,4 +1,6 @@
 export interface User {
+  authProvider?: 'local' | 'google';
+  needsOnboarding?: boolean;
   id: string;
   nama: string;
   email: string;

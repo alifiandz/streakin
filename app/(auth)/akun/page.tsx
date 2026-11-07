@@ -11,11 +11,13 @@ import { MobileContainer } from '@/components/layout/MobileContainer';
 function AuthContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { currentUser, login, register } = useAuth();
+  const { currentUser, login, register, googleEnabled, loginGoogle, loading } = useAuth();
 
   const tabParam = searchParams?.get('tab');
   const nextParam = searchParams?.get('next');
 
+  const [googleError,setGoogleError]=useState(searchParams?.get('google_error')||'');
+  const [googleBusy,setGoogleBusy]=useState(false);
   const [activeTab, setActiveTab] = useState<'register' | 'login'>(
     tabParam === 'register' ? 'register' : 'login'
   );
@@ -30,10 +32,11 @@ function AuthContent() {
 
   // If already logged in, redirect to next or home
   useEffect(() => {
-    if (currentUser) {
-      router.replace(activeTab==='register'?'/onboarding?next='+encodeURIComponent(safeReturnTo(nextParam)):safeReturnTo(nextParam));
+    if (currentUser && !loading) {
+      const googleNew=searchParams?.get('google_return')==='1'&&currentUser.authProvider==='google'&&currentUser.needsOnboarding;
+      router.replace((activeTab==='register'||googleNew)?'/onboarding?next='+encodeURIComponent(safeReturnTo(nextParam)):safeReturnTo(nextParam));
     }
-  }, [currentUser, router, nextParam,activeTab]);
+  }, [currentUser, router, nextParam,activeTab,loading,searchParams]);
 
   // Register state
   const [regNama, setRegNama] = useState('');
@@ -85,6 +88,8 @@ function AuthContent() {
     setLoginError('');
   };
 
+  if(loading)return <div role="status" className="v3-page">Memeriksa sesi akun…</div>;
+
   return (
     <div className="min-h-[100dvh] bg-[#15171A] text-[#EEF1F4] flex flex-col justify-center py-2.5 sm:py-8 overflow-x-hidden">
       <MobileContainer maxWidth="xl" withBottomNav={false}>
@@ -103,6 +108,18 @@ function AuthContent() {
 
         {/* Auth Card */}
         <div className="card-surface p-3.5 sm:p-7 border-[#2E3238] shadow-2xl relative">
+          <div className="account-google-entry">
+            {googleEnabled ? <>
+              <button type="button" className="v3-button secondary account-google-button" disabled={googleBusy||isSubmitting} onClick={async()=>{
+                setGoogleError('');setGoogleBusy(true);
+                const result=await loginGoogle(nextParam);
+                if(!result.success){setGoogleError(result.error||'Google login gagal.');setGoogleBusy(false);}
+              }}><span aria-hidden="true" className="account-google-letter">G</span>{googleBusy?'Membuka Google…':'Lanjutkan dengan Google'}</button>
+              <p>Akun terverifikasi Google. Catatan latihan tetap di perangkat ini.</p>
+            </> : <p>Google login sedang disiapkan. Akun perangkat tetap tersedia.</p>}
+            {googleError&&<p role="alert" className="account-google-error">{googleError}</p>}
+          </div>
+          <p className="account-local-label">Akun perangkat · tersimpan di browser ini</p>
           {/* Quick Demo Helper Banner - Touch friendly */}
           <div className="mb-3 p-2.5 sm:p-3 rounded-xl bg-[#FF7A03]/10 border border-[#FF7A03]/20 flex items-center justify-between text-xs gap-2">
             <div className="flex items-center gap-1.5 sm:gap-2 text-[#FF7A03]">
@@ -172,7 +189,7 @@ function AuthContent() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#8A929C] mb-1">
-                  Email Siswa / Sekolah
+                  Email
                 </label>
                 <input
                   type="email"
@@ -227,7 +244,7 @@ function AuthContent() {
 
               <div className="p-3 rounded-xl bg-[#15171A] border border-[#2E3238] text-[11px] text-[#8A929C] flex items-start gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#FF7A03] flex-shrink-0 mt-0.5" />
-                <span>Setelah mendaftar, kamu akan menyusun library latihan pertamamu (durasi 10, 15, atau 30 menit).</span>
+                <span>Pilih tujuan, alat, dan waktu latihan setelah mendaftar.</span>
               </div>
             </form>
           ) : (
