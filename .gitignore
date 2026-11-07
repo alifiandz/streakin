@@ -9,3 +9,16 @@ tests/.ui-bundle.mjs
 
 tests/.v3-*.mjs
 .v3-artifacts/
+
+# Local credentials and migration/build artifacts
+.DS_Store
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.netrc
+auth-config.local.json
+artifacts/
+coverage/
+*.log
