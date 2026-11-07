@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import {LandingSections} from '@/prototype/components/LandingSections';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Zap, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { MobileContainer } from '@/components/layout/MobileContainer';
 
@@ -24,7 +24,7 @@ export default function LandingPage() {
     return (
       <div className="min-h-[100dvh] bg-[var(--bg)] flex flex-col items-center justify-center p-4">
         <div className="w-12 h-12 rounded-2xl bg-[#FF7A03] flex items-center justify-center text-[#15171A] shadow-lg shadow-[#FF7A03]/20 animate-pulse mb-3">
-          <Zap className="w-6 h-6 fill-current stroke-[#15171A]" />
+          <img src="/images/brand/streakin-si.png" alt="StreakIn" width="48" height="48" className="w-12 h-12 rounded-full object-contain"/>
         </div>
         <p className="text-sm font-medium text-[var(--text-sub)] animate-pulse">
           Menyiapkan dashboard StreakIn kamu...

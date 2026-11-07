@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Zap, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import {safeReturnTo} from '@/v3/navigation';
 import { MobileContainer } from '@/components/layout/MobileContainer';
@@ -95,9 +95,7 @@ function AuthContent() {
       <MobileContainer maxWidth="xl" withBottomNav={false}>
         {/* Brand Header */}
         <div className="text-center mb-3 sm:mb-6">
-          <div className="inline-flex w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#FF7A03] text-[#15171A] items-center justify-center mb-2 sm:mb-2.5 shadow-lg shadow-[#FF7A03]/20">
-            <Zap className="w-5 h-5 sm:w-6 sm:h-6 fill-current stroke-[#15171A]" />
-          </div>
+          <img src="/images/brand/streakin-si.png" alt="" width="64" height="64" className="account-brand-logo"/>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#EEF1F4]">
             Streak<span className="text-[#FF7A03]">In</span>
           </h1>
