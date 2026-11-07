@@ -21,6 +21,9 @@
   <img src="https://img.shields.io/badge/Hosting-Webuzo%20%2F%20VPS-FF7A03?style=for-the-badge" alt="Hosting Webuzo / VPS" />
 </p>
 
+<p align="center"><img src="public/images/mascot/ppt-welcome.png" alt="Orange Dude smiling and waving hello" height="260" /></p>
+<p align="center"><em>Your next chapter starts with a hello. Let's get moving.</em></p>
+
 ## Stop wondering where to start. Start moving.
 
 **StreakIn brings your calisthenics journey into one place: what to train, how to work toward it, and what to do next.** Go from choosing a goal to following a session, logging your work, and coming back with a clearer next step.
@@ -31,24 +34,8 @@ From a quick session between classes to a focused skill practice, StreakIn puts 
 
 **[Find your next move at streakin.my.id →](https://streakin.my.id)**
 
-## See the skills. Build the foundations.
-
-Meet Orange Dude, the illustrated training companion throughout StreakIn. These are actual assets from the app's skill library.
-
-<table>
-  <tr>
-    <td align="center" width="33%"><img src="public/images/skills/lsit-skill-full-hold.png" alt="Orange Dude performing an L-Sit on parallettes" width="200" /><br /><strong>L-Sit</strong><br /><sub>Free foundation roadmap</sub></td>
-    <td align="center" width="33%"><img src="public/images/skills/hs-skill-chest-to-wall.png" alt="Orange Dude practicing a chest-to-wall handstand" height="190" /><br /><strong>Handstand</strong><br /><sub>Chest-to-wall progression</sub></td>
-    <td align="center" width="33%"><img src="public/images/skills/elbow-lever-full-generated.png" alt="Orange Dude performing an Elbow Lever" width="250" /><br /><strong>Elbow Lever</strong><br /><sub>Free foundation roadmap</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="public/images/skills/fl-skill-full-lever-hold.png" alt="Orange Dude illustrating a Front Lever" width="250" /><br /><strong>Front Lever</strong><br /><sub>Pro path preview</sub></td>
-    <td align="center"><img src="public/images/skills/pl-5.png" alt="Orange Dude illustrating a full Planche" width="250" /><br /><strong>Planche</strong><br /><sub>Pro path preview</sub></td>
-    <td align="center"><img src="public/images/skills/mu-5.png" alt="Orange Dude in the top support position of a Muscle-Up" height="190" /><br /><strong>Muscle-Up</strong><br /><sub>Top support position, Pro preview</sub></td>
-  </tr>
-</table>
-
-**Six skill paths. Thirty progression stages. A next step you can actually follow.** Foundation paths are Free; specialist paths are available in the Pro preview. See the current project status below for integration details.
+<p align="center"><img src="public/images/mascot/ppt-explain.png" alt="Orange Dude smiling with open hands, ready to guide you" height="240" /></p>
+<p align="center"><em>Pick your goal. I'll help you find the next step.</em></p>
 
 ## What you can do
 
